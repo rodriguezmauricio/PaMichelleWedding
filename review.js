@@ -33,6 +33,10 @@
       note: 'Guests can’t continue without a name, a yes/no, or at least one event. Email format is checked. Shows “Sending…”, and an honest error if a reply fails (v3 always said “Gracias”).' },
     { t: 'design', sel: '#dock', label: 'Changed · fades in (mobile only)', title: 'Mobile quick-links bar',
       note: 'Fades and slides in instead of popping in. Only on phones, after scrolling past the top.' },
+    { t: 'design', sel: '.split-head', label: 'Fixed · heading no longer slides over the list (phones)', title: 'Local Guide + Q&A headings',
+      note: 'In v3 these headings stayed pinned while scrolling, which on phones slid them over the list. Now pinned on desktop only, where they sit beside the list.' },
+    { t: 'design', sel: null, title: 'Fonts load from the site itself',
+      note: 'Fonts were loaded from Google and failed on some phones (default fonts showed instead). They are now part of the site: faster, always load, and no EU privacy issue with Google Fonts.' },
     { t: 'design', sel: null, href: '/guests', title: 'New: guest list page (/guests)',
       note: 'Password-protected page showing every reply, totals per event, dietary notes, and a CSV download.' },
 

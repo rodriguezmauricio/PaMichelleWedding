@@ -372,7 +372,9 @@ input::placeholder, textarea::placeholder { color: rgba(250, 246, 239, .45); }
 
 /* ---------- Guide + Q&A split ---------- */
 .split { max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 40px clamp(40px, 7vw, 112px); align-items: start; }
-.split-head { display: flex; flex-direction: column; gap: 26px; position: sticky; top: 100px; }
+.split-head { display: flex; flex-direction: column; gap: 26px; }
+/* Pin the heading beside its list only when there are two columns; in one column it would slide over the list. */
+@media (min-width: 900px) { .split-head { position: sticky; top: 100px; } }
 .salons, .qas { display: flex; flex-direction: column; border-top: 1px solid var(--navy); }
 .salon { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 0; border-bottom: 1px solid rgba(29, 62, 99, .22); }
 .salon > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
