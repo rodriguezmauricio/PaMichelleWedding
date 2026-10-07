@@ -215,7 +215,11 @@
   async function sendReply() {
     const yes = F.attending === 'yes';
     const endpoint = (window.MP_CONFIG || {}).rsvpEndpoint;
-    if (!endpoint) throw new Error('RSVP endpoint not configured (config.js)');
+    if (!endpoint) {
+      // Review mode (?review) before the backend exists: let the couple try the flow; nothing is saved.
+      if (window.MP_REVIEW) { await new Promise(r => setTimeout(r, 700)); return; }
+      throw new Error('RSVP endpoint not configured (config.js)');
+    }
     const payload = {
       name: F.name.trim(),
       attending: yes ? 'Yes' : 'No',

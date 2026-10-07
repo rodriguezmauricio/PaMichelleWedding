@@ -14,6 +14,7 @@
     active = sessionStorage.getItem('mp-review') === '1';
   } catch (e) { active = params.has('review'); }
   if (!active) return;
+  window.MP_REVIEW = true;
 
   const $ = (s, r = document) => r.querySelector(s);
   const click = sel => () => { const el = $(sel); if (el) el.click(); };
@@ -36,8 +37,8 @@
       note: 'Password-protected page showing every reply, totals per event, dietary notes, and a CSV download.' },
 
     // ---- Red: missing / needs confirmation ----
-    { t: 'missing', sel: '#rsvpForm', skip: !backendMissing, label: 'Not connected · replies are NOT saved yet', title: 'RSVP backend',
-      note: 'Replies go nowhere until the Google Sheet is connected (apps-script/SETUP.md).' },
+    { t: 'missing', sel: '#rsvpForm, #rsvpSent', skip: !backendMissing, label: 'Demo only · replies are NOT saved yet', title: 'RSVP backend',
+      note: 'In review mode you can try the whole RSVP and see “Gracias”, but nothing is saved until the Google Sheet is connected (apps-script/SETUP.md).' },
     { t: 'missing', sel: '.hero-art', label: 'Confirm · is this artwork final?', title: 'Hero illustration',
       note: 'The file is named “ChatGPT Image…”. Final, or a placeholder?' },
     { t: 'missing', sel: '[data-ev="ceremony"] .bus-note', prep: sunday, label: 'Missing · return bus times', title: 'Wedding-day buses',
@@ -173,7 +174,7 @@
     if (!item.sel) return;
     requestAnimationFrame(() => {
       apply();
-      const el = $(item.sel);
+      const el = [...document.querySelectorAll(item.sel)].find(e => e.offsetParent || getComputedStyle(e).position === 'fixed');
       if (!el) return;
       if (getComputedStyle(el).position !== 'fixed') el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       el.classList.remove('rv-flash'); void el.offsetWidth; el.classList.add('rv-flash');
