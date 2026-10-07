@@ -1,0 +1,14 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Michelle and Pa//Wedding//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:ceremony@michelle-and-pa
+DTSTAMP:20260901T000000Z
+DTSTART:20270509T140000Z
+DTEND:20270509T150000Z
+SUMMARY:Michelle & Pa — Ceremony
+LOCATION:El Salvador Church\, Nerja\, Iglesia de El Salvador\, beside Balcón de Europa\, Nerja
+END:VEVENT
+END:VCALENDAR

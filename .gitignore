@@ -1,0 +1,8 @@
+# Low-res thumbnails from the design tool (full-size versions live in assets/)
+nerja_1.webp
+nerja-2.webp
+
+.vercel
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Guest list — Michelle &amp; Pa</title>
+<meta name="theme-color" content="#1D3E63">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%231D3E63'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='30' fill='%23FAF6EF'%3EM%26amp;P%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..600;1,6..96,400..600&family=Jost:wght@300;400;500;600&family=WindSong:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .g-wrap { max-width: 1000px; margin: 0 auto; padding: 28px 22px calc(64px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 36px; }
+  .g-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; }
+  .g-top .brand { min-height: 44px; }
+  .g-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .g-btn { height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--navy); background: transparent; color: var(--navy); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; cursor: pointer; transition: background .25s, color .25s; }
+  .g-btn:hover, .g-btn.solid { background: var(--navy); color: var(--cream); }
+  .g-btn.solid:hover { background: var(--rose); border-color: var(--rose); }
+  .g-head { display: flex; flex-direction: column; gap: 18px; }
+  .g-head h1 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: clamp(44px, 11vw, 88px); line-height: .94; letter-spacing: -.04em; color: var(--navy); }
+  .g-head h1 em { color: var(--rose); }
+  .g-head p { margin: 0; font-size: 15px; line-height: 1.7; color: var(--grey); max-width: 560px; }
+
+  .g-login { display: flex; flex-direction: column; gap: 18px; max-width: 420px; padding: 32px; border: 1px solid rgba(168, 137, 79, .6); border-radius: 220px 220px 4px 4px; padding-top: 72px; background: var(--sand); }
+  .g-login label { display: flex; flex-direction: column; gap: 6px; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold-dk); font-weight: 600; }
+  .g-login input { height: 52px; border: none; border-bottom: 1px solid var(--gold); background: transparent; font-family: var(--serif); font-size: 19px; color: var(--navy); outline: none; padding: 0; border-radius: 0; letter-spacing: 0; text-transform: none; font-weight: 400; }
+  .g-login input:focus { border-bottom-color: var(--rose); }
+  .g-login input::placeholder { color: rgba(94, 88, 80, .5); }
+  .g-login button { height: 54px; border-radius: 999px; border: none; background: var(--navy); color: var(--cream); font-size: 11px; letter-spacing: .28em; text-transform: uppercase; font-weight: 600; cursor: pointer; }
+  .g-login button:hover { background: var(--rose); }
+  .g-msg { margin: 0; font-size: 14px; line-height: 1.6; color: var(--rose); }
+
+  .g-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr)); border-top: 1px solid var(--navy); }
+  .g-stat { display: flex; flex-direction: column; gap: 8px; padding: 20px 16px 20px 0; border-bottom: 1px solid rgba(29, 62, 99, .22); }
+  .g-stat b { font-family: var(--serif); font-weight: 400; font-size: 44px; line-height: 1; color: var(--navy); font-variant-numeric: lining-nums tabular-nums; }
+  .g-stat span { font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--gold-dk); font-weight: 600; }
+  .g-stat.rose b { color: var(--rose); }
+
+  .g-tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+  .g-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+  .g-filters button { height: 40px; padding: 0 16px; border: 1px solid var(--navy); border-radius: 999px; background: transparent; color: var(--navy); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; font-weight: 600; cursor: pointer; }
+  .g-filters button[aria-pressed="true"] { background: var(--navy); color: var(--cream); }
+  .g-search { height: 40px; min-width: 0; flex: 1 1 200px; max-width: 320px; border: none; border-bottom: 1px solid var(--gold); background: transparent; font-family: var(--serif); font-size: 17px; color: var(--navy); outline: none; padding: 0; border-radius: 0; }
+  .g-search::placeholder { color: rgba(94, 88, 80, .55); }
+
+  .g-list { display: flex; flex-direction: column; border-top: 1px solid var(--navy); }
+  .g-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 10px 32px; padding: 22px 0; border-bottom: 1px solid rgba(29, 62, 99, .22); }
+  .g-name { display: flex; flex-direction: column; gap: 8px; }
+  .g-name h2 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 24px; line-height: 1.2; color: var(--navy); overflow-wrap: anywhere; }
+  .g-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .g-pill { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; }
+  .g-pill.yes { background: var(--navy); color: var(--cream); }
+  .g-pill.no { background: #F3E1E4; color: var(--rose); }
+  .g-pill.dup { border: 1px solid var(--gold); color: var(--gold-dk); }
+  .g-when { font-size: 12px; color: var(--grey); }
+  .g-detail { display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.6; color: var(--text); overflow-wrap: anywhere; }
+  .g-detail strong { font-size: 9px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold-dk); font-weight: 600; margin-right: 6px; }
+  .g-note { font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--navy); }
+  .g-empty { padding: 40px 0; text-align: center; font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--grey); }
+</style>
+</head>
+<body>
+<div class="g-wrap">
+  <div class="g-top">
+    <a href="/" class="brand"><span class="brand-mono">M &amp; P</span><span class="brand-rule"></span><span class="brand-date">09.05.27</span></a>
+    <div class="g-actions" id="actions" hidden>
+      <button class="g-btn" id="refresh">Refresh</button>
+      <button class="g-btn" id="csv">Download CSV</button>
+      <button class="g-btn" id="lock">Lock</button>
+    </div>
+  </div>
+
+  <div class="g-head">
+    <div class="eyebrow"><span class="no">Private</span><span class="rule"></span><span>Guest list</span></div>
+    <h1>Who's<br><em>coming</em></h1>
+    <p id="intro">Replies arrive here as guests RSVP on the website. One reply can cover more than one name, so these are replies, not a headcount.</p>
+  </div>
+
+  <form class="g-login" id="login">
+    <label>Password<input type="password" id="key" autocomplete="current-password" placeholder="Enter the guest-list password" required></label>
+    <button type="submit" id="go">View replies</button>
+    <p class="g-msg" id="msg" role="alert" hidden></p>
+  </form>
+
+  <div id="board" hidden>
+    <div style="display:flex;flex-direction:column;gap:36px">
+      <div class="g-stats" id="stats"></div>
+      <div class="g-tools">
+        <div class="g-filters" id="filters">
+          <button type="button" data-f="all" aria-pressed="true">All</button>
+          <button type="button" data-f="yes" aria-pressed="false">Coming</button>
+          <button type="button" data-f="no" aria-pressed="false">Not coming</button>
+          <button type="button" data-f="diet" aria-pressed="false">Dietary</button>
+        </div>
+        <input class="g-search" id="search" type="search" placeholder="Search names, notes…" aria-label="Search replies">
+      </div>
+      <div class="g-list" id="list"></div>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const endpoint = (window.MP_CONFIG || {}).rsvpEndpoint;
+  const EVENTS = ['Welcome Drinks', 'Ceremony & Reception', 'The Cure'];
+  let replies = [], filter = 'all', query = '';
+
+  const store = {
+    get() { try { return sessionStorage.getItem('mp-guests-key') || ''; } catch (e) { return ''; } },
+    set(v) { try { v ? sessionStorage.setItem('mp-guests-key', v) : sessionStorage.removeItem('mp-guests-key'); } catch (e) {} },
+  };
+  const showMsg = t => { $('#msg').textContent = t; $('#msg').hidden = !t; };
+
+  // Keep only the latest reply per person (edits re-submit), but remember how many times they replied.
+  function latestPerGuest(rows) {
+    const byName = new Map();
+    rows.forEach(r => {
+      const k = r.name.toLowerCase().replace(/\s+/g, ' ').trim();
+      const prev = byName.get(k);
+      if (!prev) byName.set(k, { ...r, count: 1 });
+      else byName.set(k, { ...(new Date(r.received) >= new Date(prev.received) ? r : prev), count: prev.count + 1 });
+    });
+    return [...byName.values()].sort((a, b) => new Date(b.received) - new Date(a.received));
+  }
+
+  async function load(key) {
+    if (!endpoint) { showMsg('The RSVP backend isn’t connected yet — add the Apps Script URL to config.js (see apps-script/SETUP.md).'); return; }
+    $('#go').textContent = 'Loading…';
+    try {
+      const res = await fetch(endpoint + '?key=' + encodeURIComponent(key));
+      const out = await res.json();
+      if (!out.ok) { store.set(''); showMsg(out.error === 'unauthorized' ? 'That password isn’t right.' : 'Couldn’t load replies: ' + out.error); return; }
+      store.set(key);
+      replies = latestPerGuest(out.rows);
+      $('#login').hidden = true; $('#board').hidden = false; $('#actions').hidden = false; showMsg('');
+      render();
+    } catch (e) {
+      showMsg('Couldn’t reach the guest list. Check your connection and try again.');
+    } finally {
+      $('#go').textContent = 'View replies';
+    }
+  }
+
+  function render() {
+    const yes = replies.filter(r => r.attending === 'Yes'), no = replies.filter(r => r.attending === 'No');
+    const stats = [
+      [replies.length, 'Replies'], [yes.length, 'Coming'], [no.length, 'Not coming', 'rose'],
+      ...EVENTS.map(ev => [yes.filter(r => r.events.split(', ').includes(ev)).length, ev]),
+      [yes.filter(r => r.diet).length, 'Dietary notes'],
+    ];
+    $('#stats').innerHTML = stats.map(([n, l, c]) => `<div class="g-stat ${c || ''}"><b>${n}</b><span>${esc(l)}</span></div>`).join('');
+
+    const q = query.toLowerCase();
+    const shown = replies.filter(r =>
+      (filter === 'all' || (filter === 'yes' && r.attending === 'Yes') || (filter === 'no' && r.attending === 'No') || (filter === 'diet' && r.diet)) &&
+      (!q || [r.name, r.email, r.note, r.diet].join(' ').toLowerCase().includes(q)));
+
+    $('#list').innerHTML = shown.length ? shown.map(r => {
+      const when = new Date(r.received);
+      const whenTxt = isNaN(when) ? '' : when.toLocaleString('en-IE', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      return `<article class="g-row">
+        <div class="g-name">
+          <h2>${esc(r.name)}</h2>
+          <div class="g-badges">
+            <span class="g-pill ${r.attending === 'Yes' ? 'yes' : 'no'}">${r.attending === 'Yes' ? 'Coming' : 'Not coming'}</span>
+            ${r.count > 1 ? `<span class="g-pill dup" title="Latest reply shown">Replied ${r.count}×</span>` : ''}
+          </div>
+          <span class="g-when">${esc(whenTxt)}</span>
+        </div>
+        <div class="g-detail">
+          ${r.attending === 'Yes' ? `<span><strong>Events</strong>${esc(r.events || '—')}</span>` : ''}
+          ${r.diet ? `<span><strong>Dietary</strong>${esc(r.diet)}</span>` : ''}
+          ${r.email ? `<span><strong>Email</strong><a href="mailto:${esc(r.email)}">${esc(r.email)}</a></span>` : ''}
+          ${r.note ? `<span class="g-note">“${esc(r.note)}”</span>` : ''}
+        </div>
+      </article>`;
+    }).join('') : `<div class="g-empty">${replies.length ? 'No replies match.' : 'No replies yet.'}</div>`;
+  }
+
+  function downloadCsv() {
+    const cols = ['received', 'name', 'attending', 'events', 'diet', 'email', 'note'];
+    const cell = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+    const csv = [cols.join(','), ...replies.map(r => cols.map(c => cell(r[c])).join(','))].join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = 'michelle-pa-rsvps.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  $('#login').addEventListener('submit', e => { e.preventDefault(); const k = $('#key').value.trim(); if (k) load(k); });
+  $('#refresh').addEventListener('click', () => load(store.get()));
+  $('#csv').addEventListener('click', downloadCsv);
+  $('#lock').addEventListener('click', () => {
+    store.set(''); replies = [];
+    $('#board').hidden = true; $('#actions').hidden = true; $('#login').hidden = false; $('#key').value = '';
+  });
+  $('#filters').addEventListener('click', e => {
+    const b = e.target.closest('[data-f]'); if (!b) return;
+    filter = b.dataset.f;
+    document.querySelectorAll('#filters button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    render();
+  });
+  $('#search').addEventListener('input', e => { query = e.target.value.trim(); render(); });
+
+  if (!endpoint) showMsg('The RSVP backend isn’t connected yet — add the Apps Script URL to config.js (see apps-script/SETUP.md).');
+  else if (store.get()) load(store.get());
+})();
+</script>
+</body>
+</html>
