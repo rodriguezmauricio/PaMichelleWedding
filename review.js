@@ -61,8 +61,6 @@
       note: 'Says “Contact Michelle or Pa” with no way to contact them.' },
     { t: 'missing', sel: '.qa:last-child', label: 'Missing · same contact details', title: 'Q&A: who to contact',
       note: 'Answer is just “Michelle or Pa.” Add a phone number or email.' },
-    { t: 'missing', sel: null, title: 'Link preview image',
-      note: 'WhatsApp / iMessage previews need the final domain set in the page settings. Done once the domain is connected.' },
   ].filter(i => !i.skip);
 
   const COLORS = { design: '#EE7D1A', missing: '#E0312B' };

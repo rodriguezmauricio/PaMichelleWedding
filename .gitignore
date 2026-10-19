@@ -6,3 +6,10 @@ nerja-2.webp
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Never publish stray files dropped into this folder
+*.pdf
+*.c
+*.jpeg
+*.docx
+*.zip

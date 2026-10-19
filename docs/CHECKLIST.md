@@ -1,7 +1,7 @@
 # Wedding site checklist
 
-Live site: <https://pamichellewedding.vercel.app>
-Review link (for the couple): <https://pamichellewedding.vercel.app/?review>
+Live site: <https://www.michelleandpa.com> (also pamichellewedding.vercel.app)
+Review link (for the couple): <https://www.michelleandpa.com/?review>
 Repo: <https://github.com/rodriguezmauricio/PaMichelleWedding>
 
 Work top to bottom. Each phase can wait — nothing below breaks the live site.
