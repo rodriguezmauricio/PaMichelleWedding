@@ -17,7 +17,8 @@ Work top to bottom. Each phase can wait — nothing below breaks the live site.
 - [ ] Get their approval on the overall design.
 - [ ] Collect answers to the red items:
   - [ ] Hero illustration: final, or replace it?
-  - [ ] Return bus times from La Viñuela after the reception
+  - [x] ~~Return buses / end time~~ — client replied: reception ends 2:30, buses back to Nerja town, taxis bookable on the night (added to site; confirm "2:30" means 2:30am)
+  - [ ] Exact time the buses leave La Viñuela
   - [ ] Full address of B bou Hotel La Viñuela & Spa
   - [ ] Phone number or link for Manolo / Nexotransfer
   - [ ] Phone or email guests should use to contact Michelle or Pa (footer + Q&A)

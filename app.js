@@ -92,8 +92,8 @@
     { id: 'ceremony', day: 'sun', date: '9 May', title: 'Ceremony', time: '16:00', bus: true,
       desc: 'Please join us in El Salvador Church, Nerja at 4pm for our wedding ceremony. This is located right in the centre of town. After we say "I Do" there will be buses departing from Carabeo car park taking us to the venue.',
       venue: 'El Salvador Church, Nerja', address: 'Iglesia de El Salvador, beside Balcón de Europa, Nerja', q: 'Iglesia de El Salvador, Nerja' },
-    { id: 'reception', day: 'sun', date: '9 May', title: 'Wedding Reception', time: '18:00',
-      desc: 'Our wedding reception will take place at Hotel La Viñuela, a stunning lakefront boutique hotel approximately 40 minutes from Nerja town centre. Complimentary buses will be provided to the venue on the day of the wedding.',
+    { id: 'reception', day: 'sun', date: '9 May', title: 'Wedding Reception', time: '18:00', end: '02:30',
+      desc: 'Our wedding reception will take place at Hotel La Viñuela, a stunning lakefront boutique hotel approximately 40 minutes from Nerja town centre. Complimentary buses will be provided to the venue on the day of the wedding, and back to Nerja town at the end of the night. The reception finishes at 2:30am.',
       venue: 'B bou Hotel La Viñuela & Spa', address: 'Lake Viñuela, approx. 40 min from Nerja', q: 'B bou Hotel La Viñuela & Spa' },
     { id: 'day2', day: 'mon', date: '10 May', title: 'The Cure', time: '19:00',
       desc: 'Join us for the cure (a shot of cold Jäger) and to finish off the celebrations at Buddha Bar rooftop terrace. Pizzas and tapas will be served at 7pm.',
@@ -111,7 +111,7 @@
     <article class="event" data-ev="${e.id}">
       <div class="event-rail"><span></span><span></span></div>
       <div class="event-body">
-        <div class="event-time"><span>${e.time}</span><span>${e.num} · ${e.date}</span></div>
+        <div class="event-time"><span>${e.time}</span><span>${e.num} · ${e.date}${e.end ? ' · until ' + e.end : ''}</span></div>
         <h3 class="event-title">${esc(e.title)}</h3>
         <p class="copy">${esc(e.desc)}</p>
         <div class="venue"><span class="label">Venue</span><span>${esc(e.venue)}</span><span>${esc(e.address)}</span></div>
@@ -119,7 +119,7 @@
           <a class="pill pill-solid" href="${maps(e.q)}" target="_blank" rel="noopener">Directions ↗</a>
           <a class="pill pill-line" href="cal/michelle-pa-${e.id}.ics">Calendar +</a>
         </div>
-        ${e.bus ? `<div class="bus-note"><span>then →</span><span>Complimentary buses depart <strong>Carabeo car park</strong> for La Viñuela, about 40 minutes away. Return times to follow.</span></div>` : ''}
+        ${e.bus ? `<div class="bus-note"><span>then →</span><span>Complimentary buses depart <strong>Carabeo car park</strong> for La Viñuela, about 40 minutes away. Buses will also bring everyone back to Nerja town at the end of the night.</span></div>` : ''}
       </div>
     </article>`;
 
@@ -346,7 +346,7 @@
     ['Can I bring a plus one?', "Check your invite to see if you've got a plus one!"],
     ['Are children welcome?', 'As much as we adore your little ones, we won\'t be able to accommodate them at the ceremony or reception. We know some of you will travel with children, so they\'re more than welcome at "Day 0" and "Day 2", along with any relatives looking after them.', 'sitter'],
     ['Would you recommend hiring a car?', "If you're staying in Nerja town centre, you won't need one."],
-    ['If I leave the reception early, how do I get back to Nerja?', 'Our wedding planner Patty will be there to organise taxis for anyone leaving early, grouping people to keep costs down.'],
+    ['If I leave the reception early, how do I get back to Nerja?', 'The reception finishes at 2:30am, and buses will take everyone back to Nerja town. If you want to leave earlier, taxis can be booked on the night of the wedding — our wedding planner Patty will be there to organise them, grouping people to keep costs down.'],
     ['Hair & makeup recommendations?', "We've gathered eight salons in Nerja, with tap-to-call numbers, in our Local Guide.", 'link'],
     ['What shoes should I wear?', 'Part of the reception area is on grass — opt for block heels or sandals instead of stilettos!'],
     ['Is the wedding indoors or outdoors?', 'The reception will be outside overlooking Lake Viñuela, and the party moves inside later on.'],
