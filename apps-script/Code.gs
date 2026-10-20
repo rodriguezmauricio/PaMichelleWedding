@@ -13,7 +13,7 @@
  */
 
 const SHEET_NAME = 'RSVPs';
-const HEADERS = ['Received', 'Name', 'Attending', 'Events', 'Dietary', 'Email', 'Note'];
+const HEADERS = ['Received', 'Name', 'Attending', 'Guests', 'Events', 'Dietary', 'Email', 'Note'];
 
 function sheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -46,7 +46,8 @@ function doPost(e) {
     const attending = d.attending === 'Yes' ? 'Yes' : d.attending === 'No' ? 'No' : '';
     if (!name || !attending) return json_({ ok: false, error: 'missing name or attendance' });
 
-    const row = [new Date(), name, attending, clean_(d.events, 200), clean_(d.diet, 300), clean_(d.email, 200), clean_(d.note, 2000)];
+    const guests = attending === 'Yes' ? Math.min(12, Math.max(1, parseInt(d.guests, 10) || 1)) : 0;
+    const row = [new Date(), name, attending, guests, clean_(d.events, 200), clean_(d.diet, 300), clean_(d.email, 200), clean_(d.note, 2000)];
     const lock = LockService.getScriptLock();
     lock.waitLock(10000);
     try { sheet_().appendRow(row); } finally { lock.releaseLock(); }
@@ -56,17 +57,18 @@ function doPost(e) {
       const lines = [
         'Name: ' + row[1],
         'Attending: ' + row[2],
-        attending === 'Yes' ? 'Events: ' + row[3] : '',
-        row[4] ? 'Dietary: ' + row[4] : '',
-        row[5] ? 'Email: ' + row[5] : '',
-        row[6] ? 'Note: ' + row[6] : '',
+        attending === 'Yes' ? 'Guests: ' + row[3] : '',
+        attending === 'Yes' ? 'Events: ' + row[4] : '',
+        row[5] ? 'Dietary: ' + row[5] : '',
+        row[6] ? 'Email: ' + row[6] : '',
+        row[7] ? 'Note: ' + row[7] : '',
       ].filter(Boolean);
       const mail = {
         to: to,
-        subject: 'RSVP — ' + row[1] + (attending === 'Yes' ? ' is coming' : ' can’t make it'),
+        subject: 'RSVP — ' + row[1] + (attending === 'Yes' ? ' (' + row[3] + ') is coming' : ' can’t make it'),
         body: lines.join('\n') + '\n\nAll replies: ' + SpreadsheetApp.getActiveSpreadsheet().getUrl(),
       };
-      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row[5])) mail.replyTo = row[5];
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row[6])) mail.replyTo = row[6];
       MailApp.sendEmail(mail);
     }
     return json_({ ok: true });
@@ -83,8 +85,8 @@ function doGet(e) {
   const values = sheet_().getDataRange().getValues().slice(1);
   const rows = values.map(r => ({
     received: r[0] instanceof Date ? r[0].toISOString() : String(r[0]),
-    name: String(r[1]), attending: String(r[2]), events: String(r[3]),
-    diet: String(r[4]), email: String(r[5]), note: String(r[6]),
+    name: String(r[1]), attending: String(r[2]), guests: Number(r[3]) || 0, events: String(r[4]),
+    diet: String(r[5]), email: String(r[6]), note: String(r[7]),
   }));
   return json_({ ok: true, rows: rows });
 }

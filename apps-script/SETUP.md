@@ -5,7 +5,7 @@ Takes about 10 minutes, once.
 
 ## 1. Create the sheet
 
-1. Signed in to the Google account that should own the replies (ideally Michelle's or Pa's), open <https://sheets.new>.
+1. Signed in to the couple's account (**michelleandpa2027@gmail.com**, which will own the replies), open <https://sheets.new>.
 2. Name it `Michelle & Pa — RSVPs`.
 
 ## 2. Add the script
@@ -22,7 +22,7 @@ Takes about 10 minutes, once.
 | Property | Value |
 |---|---|
 | `ADMIN_KEY` | A password for the `/guests` page. Pick something long, e.g. `nerja-bougainvillea-0905`. |
-| `NOTIFY_EMAIL` | Who gets an email on every reply, e.g. `michelle@example.com,pa@example.com`. Leave out to disable emails. |
+| `NOTIFY_EMAIL` | Who gets an email on every reply: `michelleandpa2027@gmail.com` (add more addresses separated by commas). Leave out to disable emails. |
 
 3. Click **Save script properties**.
 
@@ -53,7 +53,7 @@ Commit and push. Vercel redeploys automatically.
 ## 6. Test
 
 1. Open the site, send a test RSVP.
-2. A row should appear in the **RSVPs** tab of the sheet, and an email should arrive.
+2. A row should appear in the **RSVPs** tab of the sheet (columns: Received, Name, Attending, Guests, Events, Dietary, Email, Note), and an email should arrive.
 3. Open `https://<your-domain>/guests`, enter the `ADMIN_KEY` password, and check that the reply shows.
 4. Delete the test row from the sheet.
 

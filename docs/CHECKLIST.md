@@ -17,14 +17,14 @@ Work top to bottom. Each phase can wait — nothing below breaks the live site.
 - [ ] Get their approval on the overall design.
 - [ ] Collect answers to the red items:
   - [ ] Hero illustration: final, or replace it?
-  - [x] ~~Return buses / end time~~ — client replied: reception ends 2:30, buses back to Nerja town, taxis bookable on the night (added to site; confirm "2:30" means 2:30am)
-  - [ ] Exact time the buses leave La Viñuela
-  - [ ] Full address of B bou Hotel La Viñuela & Spa
-  - [ ] Phone number or link for Manolo / Nexotransfer
-  - [ ] Phone or email guests should use to contact Michelle or Pa (footer + Q&A)
-  - [ ] Headcount: add a "How many guests in this reply?" field? (yes / no)
-  - [ ] Who should get an email on every RSVP (one or both of them)?
-  - [ ] Whose Google account should own the RSVP spreadsheet?
+  - [x] 2:30 = 2:30am: confirmed. Buses leave the hotel at 2:30am; taxis organised at the hotel (EUR 50-60)
+  - [x] Reception address: Vereda de Vélez, SN, 29712, Málaga, Spain
+  - [x] Contact details: Michelle 085 736 9303, Pa 085 108 3627 (shown as +353), michelleandpa2027@gmail.com. Matt removed from the footer
+  - [x] Headcount field: yes, added ("How many in your party?")
+  - [x] RSVP emails go to michelleandpa2027@gmail.com, which also owns the sheet
+  - [ ] Manolo / Nexotransfer: the couple weren't sure. Find a phone/link, or remove him
+  - [ ] Matt's email is still in the **Stay** section ("Need help choosing?"). Remove too, or swap for the couple's email?
+  - [ ] Confirm the phone numbers are Irish (+353)
 - [ ] Send Claude their answers → Claude updates the site and pushes (Vercel redeploys automatically).
 
 ## Phase 2 — Connect RSVPs (~10 min, in the couple's Google account)

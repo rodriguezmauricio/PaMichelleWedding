@@ -438,3 +438,12 @@ input::placeholder, textarea::placeholder { color: rgba(250, 246, 239, .45); }
   .marquee-track { animation: none; }
   .reveal-pending { opacity: 1; transform: none; }
 }
+
+/* ---------- RSVP party size ---------- */
+.party { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 20px; border: 1px solid rgba(217, 192, 142, .45); border-radius: 4px; }
+.party > span { font-family: var(--serif); font-size: 17px; line-height: 1.25; }
+.stepper { display: flex; align-items: center; gap: 4px; flex: none; }
+.stepper b { min-width: 34px; text-align: center; font-family: var(--serif); font-weight: 400; font-size: 28px; font-variant-numeric: lining-nums tabular-nums; }
+.stepper button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(217, 192, 142, .6); background: transparent; color: var(--cream); font-size: 22px; line-height: 1; cursor: pointer; transition: background .2s, color .2s; }
+.stepper button:hover:not([disabled]) { background: var(--cream); color: var(--navy); }
+.stepper button[disabled] { opacity: .3; cursor: default; }

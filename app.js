@@ -93,8 +93,8 @@
       desc: 'Please join us in El Salvador Church, Nerja at 4pm for our wedding ceremony. This is located right in the centre of town. After we say "I Do" there will be buses departing from Carabeo car park taking us to the venue.',
       venue: 'El Salvador Church, Nerja', address: 'Iglesia de El Salvador, beside Balcón de Europa, Nerja', q: 'Iglesia de El Salvador, Nerja' },
     { id: 'reception', day: 'sun', date: '9 May', title: 'Wedding Reception', time: '18:00', end: '02:30',
-      desc: 'Our wedding reception will take place at Hotel La Viñuela, a stunning lakefront boutique hotel approximately 40 minutes from Nerja town centre. Complimentary buses will be provided to the venue on the day of the wedding, and back to Nerja town at the end of the night. The reception finishes at 2:30am.',
-      venue: 'B bou Hotel La Viñuela & Spa', address: 'Lake Viñuela, approx. 40 min from Nerja', q: 'B bou Hotel La Viñuela & Spa' },
+      desc: 'Our wedding reception will take place at Hotel La Viñuela, a stunning lakefront boutique hotel approximately 40 minutes from Nerja town centre. Complimentary buses will be provided to the venue on the day of the wedding, and back to Nerja town at the end of the night. The reception finishes at 2:30am, when the buses leave for Nerja town.',
+      venue: 'B bou Hotel La Viñuela & Spa', address: 'Vereda de Vélez, SN, 29712, Málaga, Spain', q: 'B bou Hotel La Viñuela & Spa, Vereda de Vélez, 29712 Málaga' },
     { id: 'day2', day: 'mon', date: '10 May', title: 'The Cure', time: '19:00',
       desc: 'Join us for the cure (a shot of cold Jäger) and to finish off the celebrations at Buddha Bar rooftop terrace. Pizzas and tapas will be served at 7pm.',
       venue: 'Buddha Bar', address: 'C. de la Gloria, 13, 29780 Nerja, Málaga, Spain', q: 'Buddha Bar, C. de la Gloria 13, Nerja' },
@@ -119,7 +119,7 @@
           <a class="pill pill-solid" href="${maps(e.q)}" target="_blank" rel="noopener">Directions ↗</a>
           <a class="pill pill-line" href="cal/michelle-pa-${e.id}.ics">Calendar +</a>
         </div>
-        ${e.bus ? `<div class="bus-note"><span>then →</span><span>Complimentary buses depart <strong>Carabeo car park</strong> for La Viñuela, about 40 minutes away. Buses will also bring everyone back to Nerja town at the end of the night.</span></div>` : ''}
+        ${e.bus ? `<div class="bus-note"><span>then →</span><span>Complimentary buses depart <strong>Carabeo car park</strong> for La Viñuela, about 40 minutes away. Buses will also bring everyone back to Nerja town, leaving the hotel at 2:30am.</span></div>` : ''}
       </div>
     </article>`;
 
@@ -150,7 +150,7 @@
 
   /* ---------- RSVP ---------- */
   const EVENT_CHOICES = [['welcome', 'Welcome Drinks', 'Sat 8 May · 18:00'], ['wedding', 'Ceremony & Reception', 'Sun 9 May · 16:00'], ['cure', 'The Cure', 'Mon 10 May · 19:00']];
-  const F = { name: '', attending: null, events: ['welcome', 'wedding', 'cure'], diet: '', email: '', note: '' };
+  const F = { name: '', attending: null, guests: 1, events: ['welcome', 'wedding', 'cure'], diet: '', email: '', note: '' };
   let step = 0, sending = false;
   const form = $('#rsvpForm'), stepEl = $('#rsvpStep'), nextBtn = $('#rsvpNext'), backBtn = $('#rsvpBack'), errEl = $('#rsvpError'), sentEl = $('#rsvpSent');
 
@@ -187,6 +187,8 @@
           `<button type="button" class="opt" data-attend="${v}" aria-pressed="${F.attending === v}"><span>${s}</span><span>${l}</span></button>`).join('')}</div></div>`;
     } else if (cur === 'events') {
       stepEl.innerHTML = `<div class="step"><span class="q">Which will you join?</span>
+        <div class="party"><span>How many in your party, including you?</span>
+          <div class="stepper"><button type="button" data-guests="-1" aria-label="One fewer guest"${F.guests <= 1 ? ' disabled' : ''}>−</button><b id="guestCount">${F.guests}</b><button type="button" data-guests="1" aria-label="One more guest"${F.guests >= 12 ? ' disabled' : ''}>+</button></div></div>
         <div class="chips">${EVENT_CHOICES.map(([k, l, s]) => { const on = F.events.includes(k);
           return `<button type="button" class="opt" data-event="${k}" aria-pressed="${on}"><span class="chip-text"><span>${esc(l)}</span><span>${s}</span></span><span class="chip-mark">${on ? '✓' : ''}</span></button>`; }).join('')}</div>
         <label class="field">Dietary requirements<input class="line-input" data-k="diet" placeholder="None" value="${esc(F.diet)}"></label></div>`;
@@ -200,7 +202,8 @@
 
   stepEl.addEventListener('input', e => { const k = e.target.dataset.k; if (k) { F[k] = e.target.value; syncButton(); } });
   stepEl.addEventListener('click', e => {
-    const a = e.target.closest('[data-attend]'), ev = e.target.closest('[data-event]');
+    const a = e.target.closest('[data-attend]'), ev = e.target.closest('[data-event]'), g = e.target.closest('[data-guests]');
+    if (g) { F.guests = Math.min(12, Math.max(1, F.guests + Number(g.dataset.guests))); renderRsvp(); $(`[data-guests="${g.dataset.guests}"]`, stepEl)?.focus(); return; }
     if (a) { F.attending = a.dataset.attend; renderRsvp(); a && $(`[data-attend="${F.attending}"]`, stepEl).focus(); }
     if (ev) {
       const k = ev.dataset.event;
@@ -223,6 +226,7 @@
     const payload = {
       name: F.name.trim(),
       attending: yes ? 'Yes' : 'No',
+      guests: yes ? F.guests : 0,
       events: yes ? EVENT_CHOICES.filter(([k]) => F.events.includes(k)).map(([, l]) => l).join(', ') : '',
       diet: yes ? F.diet.trim() : '',
       email: F.email.trim(),
@@ -250,7 +254,7 @@
       await sendReply();
       const fn = firstName(), yes = F.attending === 'yes';
       $('#sentLine').textContent = yes ? `We can't wait to see you${fn ? ', ' + fn : ''}.` : `We'll miss you${fn ? ', ' + fn : ''}.`;
-      $('#sentSub').textContent = yes ? `Your reply for ${F.events.length} of 3 events has been received.` : 'Thank you for letting us know — your reply has been received.';
+      $('#sentSub').textContent = yes ? `Your reply for ${F.guests} ${F.guests === 1 ? 'guest' : 'guests'} at ${F.events.length} of 3 events has been received.` : 'Thank you for letting us know — your reply has been received.';
       form.hidden = true; sentEl.hidden = false;
     } catch (err) {
       errEl.textContent = 'Sorry — your reply didn’t send. Please try again, or message Michelle or Pa directly.';
@@ -346,11 +350,11 @@
     ['Can I bring a plus one?', "Check your invite to see if you've got a plus one!"],
     ['Are children welcome?', 'As much as we adore your little ones, we won\'t be able to accommodate them at the ceremony or reception. We know some of you will travel with children, so they\'re more than welcome at "Day 0" and "Day 2", along with any relatives looking after them.', 'sitter'],
     ['Would you recommend hiring a car?', "If you're staying in Nerja town centre, you won't need one."],
-    ['If I leave the reception early, how do I get back to Nerja?', 'The reception finishes at 2:30am, and buses will take everyone back to Nerja town. If you want to leave earlier, taxis can be booked on the night of the wedding — our wedding planner Patty will be there to organise them, grouping people to keep costs down.'],
+    ['If I leave the reception early, how do I get back to Nerja?', 'The reception finishes at 2:30am, when buses leave the hotel for Nerja town. If you want to leave earlier, taxis can be organised at the hotel on the night of the wedding — expect to pay about €50–€60.'],
     ['Hair & makeup recommendations?', "We've gathered eight salons in Nerja, with tap-to-call numbers, in our Local Guide.", 'link'],
     ['What shoes should I wear?', 'Part of the reception area is on grass — opt for block heels or sandals instead of stilettos!'],
     ['Is the wedding indoors or outdoors?', 'The reception will be outside overlooking Lake Viñuela, and the party moves inside later on.'],
-    ['Who should I contact with questions?', 'Michelle or Pa.'],
+    ['Who should I contact with questions?', 'Michelle or Pa — call or message us, or send an email.', 'contact'],
   ];
   $('#qas').innerHTML = QA.map(([q, a, x], i) => `
     <div class="qa">
@@ -358,6 +362,7 @@
       <div class="qa-a" id="qa-${i}" hidden>
         <p>${esc(a)}</p>
         ${x === 'sitter' ? `<div class="sitter"><span>Need a babysitter?</span><span>Our wedding planner recommends <strong>Becky</strong> — she has worked with Patty for over 15 years and comes highly recommended. Reviews: Facebook page "Creche Spain".</span><a href="mailto:crechespain@gmail.com">crechespain@gmail.com</a></div>` : ''}
+        ${x === 'contact' ? `<div class="sitter"><span>Michelle</span><a href="tel:+353857369303">+353 85 736 9303</a><span>Pa</span><a href="tel:+353851083627">+353 85 108 3627</a><a href="mailto:michelleandpa2027@gmail.com">michelleandpa2027@gmail.com</a></div>` : ''}
         ${x === 'link' ? `<a href="#guide">Open the Local Guide →</a>` : ''}
       </div>
     </div>`).join('');
