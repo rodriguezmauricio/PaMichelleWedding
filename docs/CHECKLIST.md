@@ -29,14 +29,17 @@ Work top to bottom. Each phase can wait — nothing below breaks the live site.
 
 ## Phase 2 — Connect RSVPs (~10 min, in the couple's Google account)
 
-- [ ] Follow [apps-script/SETUP.md](../apps-script/SETUP.md), steps 1–4.
-- [ ] Choose the `/guests` password (`ADMIN_KEY`) and share it with the couple privately.
-- [ ] Send Claude the **Web app URL** (ends in `/exec`) → Claude puts it in `config.js` and pushes.
+Tested end to end on 24 Oct 2026 in Mauricio's own account (sheet "Michelle & Pa — RSVPs (TEST, Mauricio)"): row in the sheet, notification email, `/guests` all worked. The live site currently points at that test deployment. Repeat in the couple's account:
+
+- [ ] Signed in as michelleandpa2027@gmail.com, follow [apps-script/SETUP.md](../apps-script/SETUP.md), steps 1–4 (Deploy type must be **Web app**, not API Executable; add both `ADMIN_KEY` and `NOTIFY_EMAIL`).
+- [ ] Choose a new `/guests` password (`ADMIN_KEY`) and share it with the couple privately.
+- [ ] Send Claude the new **Web app URL** (ends in `/exec`) → Claude puts it in `config.js` and pushes.
 - [ ] Test: send one RSVP on the **plain** site (no `?review`).
   - [ ] A row appears in the sheet
   - [ ] The notification email arrives
   - [ ] It shows on `/guests` after entering the password
   - [ ] Delete the test row from the sheet
+- [ ] Afterwards: delete the test sheet and its Apps Script deployment in Mauricio's account (Deploy → Manage deployments → Archive), so the old URL stops working.
 
 ## Phase 3 — Custom domain
 

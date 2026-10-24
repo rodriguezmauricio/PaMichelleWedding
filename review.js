@@ -41,6 +41,8 @@
       note: 'Address Vereda de Vélez, SN, 29712, Málaga. Ends 2:30am, buses leave then; taxis can be organised at the hotel (about €50–€60).' },
     { t: 'design', sel: null, title: 'RSVP: “How many in your party?”',
       note: 'New + / − counter on the attending step. The guest list adds these up into a headcount (total guests, and guests per event).' },
+    { t: 'design', sel: '.hero-name', label: 'Changed · Playfair Display', title: 'Headings font',
+      note: 'Headings and italic text now use Playfair Display instead of Bodoni Moda, across the whole site and the guest list.' },
     { t: 'design', sel: null, title: 'Fonts load from the site itself',
       note: 'Fonts were loaded from Google and failed on some phones (default fonts showed instead). They are now part of the site: faster, always load, and no EU privacy issue with Google Fonts.' },
     { t: 'design', sel: null, href: '/guests', title: 'New: guest list page (/guests)',

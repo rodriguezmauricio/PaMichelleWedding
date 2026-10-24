@@ -183,7 +183,7 @@
     } else if (cur === 'attend') {
       const fn = firstName();
       stepEl.innerHTML = `<div class="step" style="text-align:center"><span class="q">${esc(fn ? fn + ', will you attend?' : 'Will you attend?')}</span>
-        <div class="attend">${[['yes', 'Sí', 'Joyfully accepts'], ['no', 'Ay…', 'Regretfully declines']].map(([v, s, l]) =>
+        <div class="attend">${[['yes', 'Yes', 'Joyfully accepts'], ['no', 'No', 'Regretfully declines']].map(([v, s, l]) =>
           `<button type="button" class="opt" data-attend="${v}" aria-pressed="${F.attending === v}"><span>${s}</span><span>${l}</span></button>`).join('')}</div></div>`;
     } else if (cur === 'events') {
       stepEl.innerHTML = `<div class="step"><span class="q">Which will you join?</span>
@@ -253,7 +253,7 @@
     try {
       await sendReply();
       const fn = firstName(), yes = F.attending === 'yes';
-      $('#sentLine').textContent = yes ? `We can't wait to see you${fn ? ', ' + fn : ''}.` : `We'll miss you${fn ? ', ' + fn : ''}.`;
+      $('#sentLine').textContent = yes ? `We're looking forward to seeing you${fn ? ', ' + fn : ''}.` : `We'll miss you${fn ? ', ' + fn : ''}.`;
       $('#sentSub').textContent = yes ? `Your reply for ${F.guests} ${F.guests === 1 ? 'guest' : 'guests'} at ${F.events.length} of 3 events has been received.` : 'Thank you for letting us know — your reply has been received.';
       form.hidden = true; sentEl.hidden = false;
     } catch (err) {
