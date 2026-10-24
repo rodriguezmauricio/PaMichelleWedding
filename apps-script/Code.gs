@@ -1,8 +1,9 @@
 /**
  * Michelle & Pa — RSVP backend (Google Apps Script bound to a Google Sheet).
  *
- * doPost: the website sends each RSVP here; it is appended to the "RSVPs" tab
- *         and (optionally) emailed to NOTIFY_EMAIL.
+ * doPost: the website sends each RSVP here; it is written to the "RSVPs" tab
+ *         (a repeat reply from the same name replaces that person's row) and
+ *         (optionally) emailed to NOTIFY_EMAIL.
  * doGet:  the /guests page reads all replies, only with the correct ADMIN_KEY.
  *
  * Script properties (Project Settings → Script properties):
@@ -37,12 +38,34 @@ function clean_(value, max) {
   return /^[=+\-@]/.test(s) ? "'" + s : s;
 }
 
+// Key used to recognise the same guest replying again (e.g. after "Edit reply").
+function nameKey_(value) {
+  return String(value == null ? '' : value).replace(/^'/, '').toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+// Write the row: replace this guest's earlier row if the name matches, else append. Returns true if replaced.
+function upsert_(sh, row) {
+  const key = nameKey_(row[1]);
+  const last = sh.getLastRow();
+  if (last > 1) {
+    const names = sh.getRange(2, 2, last - 1, 1).getValues();
+    for (let i = names.length - 1; i >= 0; i--) {
+      if (nameKey_(names[i][0]) === key) {
+        sh.getRange(i + 2, 1, 1, HEADERS.length).setValues([row]);
+        return true;
+      }
+    }
+  }
+  sh.appendRow(row);
+  return false;
+}
+
 function doPost(e) {
   try {
     const d = JSON.parse((e && e.postData && e.postData.contents) || '{}');
     if (d.website) return json_({ ok: true }); // honeypot field filled → bot, drop silently
 
-    const name = clean_(d.name, 200);
+    const name = clean_(d.name, 200).replace(/\s+/g, ' ');
     const attending = d.attending === 'Yes' ? 'Yes' : d.attending === 'No' ? 'No' : '';
     if (!name || !attending) return json_({ ok: false, error: 'missing name or attendance' });
 
@@ -50,7 +73,8 @@ function doPost(e) {
     const row = [new Date(), name, attending, guests, clean_(d.events, 200), clean_(d.diet, 300), clean_(d.email, 200), clean_(d.note, 2000)];
     const lock = LockService.getScriptLock();
     lock.waitLock(10000);
-    try { sheet_().appendRow(row); } finally { lock.releaseLock(); }
+    let replaced = false;
+    try { replaced = upsert_(sheet_(), row); } finally { lock.releaseLock(); }
 
     const to = PropertiesService.getScriptProperties().getProperty('NOTIFY_EMAIL');
     if (to) {
@@ -63,9 +87,10 @@ function doPost(e) {
         row[6] ? 'Email: ' + row[6] : '',
         row[7] ? 'Note: ' + row[7] : '',
       ].filter(Boolean);
+      if (replaced) lines.push('', 'This replaces an earlier reply from the same name.');
       const mail = {
         to: to,
-        subject: 'RSVP — ' + row[1] + (attending === 'Yes' ? ' (' + row[3] + ') is coming' : ' can’t make it'),
+        subject: (replaced ? 'RSVP updated — ' : 'RSVP — ') + row[1] + (attending === 'Yes' ? ' (' + row[3] + ') is coming' : ' can’t make it'),
         body: lines.join('\n') + '\n\nAll replies: ' + SpreadsheetApp.getActiveSpreadsheet().getUrl(),
       };
       if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row[6])) mail.replyTo = row[6];

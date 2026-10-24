@@ -7,7 +7,7 @@ Wedding website. Plain HTML/CSS/JS, no build step, hosted on Vercel.
 | `index.html`, `styles.css`, `app.js` | The website |
 | `guests.html` | Private guest list at `/guests` (password = `ADMIN_KEY` in Apps Script) |
 | `config.js` | RSVP endpoint (Google Apps Script web app URL) |
-| `apps-script/` | RSVP backend code + [setup steps](apps-script/SETUP.md) |
+| `apps-script/` | RSVP backend code + [setup steps](apps-script/SETUP.md) (click-through guide: [docs/setup-guide.html](docs/setup-guide.html)) |
 | `review.js` | Review mode: open the site with `?review` to see design changes (orange) and open items (red) |
 | `cal/` | Calendar files for each event |
 | `assets/` | Images and link-preview image |

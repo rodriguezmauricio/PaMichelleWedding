@@ -31,7 +31,7 @@ Work top to bottom. Each phase can wait — nothing below breaks the live site.
 
 Tested end to end on 24 Oct 2026 in Mauricio's own account (sheet "Michelle & Pa — RSVPs (TEST, Mauricio)"): row in the sheet, notification email, `/guests` all worked. The live site currently points at that test deployment. Repeat in the couple's account:
 
-- [ ] Signed in as michelleandpa2027@gmail.com, follow [apps-script/SETUP.md](../apps-script/SETUP.md), steps 1–4 (Deploy type must be **Web app**, not API Executable; add both `ADMIN_KEY` and `NOTIFY_EMAIL`).
+- [ ] Signed in as michelleandpa2027@gmail.com, follow [docs/setup-guide.html](setup-guide.html) (same steps as [apps-script/SETUP.md](../apps-script/SETUP.md)), steps 1–4 (Deploy type must be **Web app**, not API Executable; add both `ADMIN_KEY` and `NOTIFY_EMAIL`).
 - [ ] Choose a new `/guests` password (`ADMIN_KEY`) and share it with the couple privately.
 - [ ] Send Claude the new **Web app URL** (ends in `/exec`) → Claude puts it in `config.js` and pushes.
 - [ ] Test: send one RSVP on the **plain** site (no `?review`).
