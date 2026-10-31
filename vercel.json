@@ -10,6 +10,10 @@
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
     },
     {
+      "source": "/review-answers",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
       "source": "/guests",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
     }

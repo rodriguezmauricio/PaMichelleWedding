@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Review answers — Michelle &amp; Pa</title>
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; margin: 0; padding: 24px; background: #FAF6EF; color: #1E2A3A; }
+  main { max-width: 820px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  input, button { font: inherit; padding: 8px 12px; border-radius: 6px; border: 1px solid #1E2A3A; }
+  button { background: #1E2A3A; color: #fff; cursor: pointer; }
+  .sum { display: flex; gap: 16px; margin: 16px 0; font-weight: 600; }
+  .card { background: #fff; border: 1px solid #ddd; border-left: 4px solid #999; border-radius: 6px; padding: 10px 14px; margin: 8px 0; }
+  .card.CHANGE { border-left-color: #EE7D1A; } .card.OK { border-left-color: #2E7D4F; }
+  .card h3 { margin: 0 0 4px; font-size: 15px; }
+  .row { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  .tag { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; color: #fff; background: #999; }
+  .tag.OK { background: #2E7D4F; } .tag.CHANGE { background: #EE7D1A; }
+  small { color: #777; } p { margin: 4px 0 0; } .err { color: #c0392b; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Review answers</h1>
+  <small>Private. Answers from the couple's <code>?review</code> panel. Latest answer per person and item.</small>
+  <form id="login" style="margin:16px 0;display:flex;gap:8px">
+    <input type="password" id="key" placeholder="Guest-list password" required>
+    <button>Open</button>
+  </form>
+  <p class="err" id="err"></p>
+  <div id="out" hidden>
+    <div class="sum" id="sum"></div>
+    <button id="refresh" type="button">Refresh</button>
+    <div id="list"></div>
+  </div>
+</main>
+<script src="config.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = v => String(v == null ? '' : v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  let key = '';
+  try { key = sessionStorage.getItem('mp-guests-key') || ''; } catch (e) {}
+  async function load() {
+    $('#err').textContent = '';
+    try {
+      const res = await fetch(window.MP_CONFIG.rsvpEndpoint + '?view=review&key=' + encodeURIComponent(key));
+      const out = await res.json();
+      if (!out.ok) throw new Error(out.error === 'unauthorized' ? 'Wrong password.' : out.error);
+      render(out.rows || []);
+    } catch (e) { $('#err').textContent = e.message || 'Could not load.'; $('#out').hidden = true; }
+  }
+  function render(rows) {
+    const by = {};
+    rows.forEach(r => (by[r.id] = by[r.id] || { title: r.title, type: r.type, list: [] }).list.push(r));
+    const ids = Object.keys(by);
+    const n = s => rows.filter(r => r.status === s).length;
+    $('#sum').innerHTML = `<span>${ids.length} items answered</span><span style="color:#2E7D4F">${n('OK')} OK</span><span style="color:#EE7D1A">${n('CHANGE')} to change</span>`;
+    ids.sort((a, b) => (by[b].list.some(r => r.status === 'CHANGE') - by[a].list.some(r => r.status === 'CHANGE')) || (by[a].type === 'Question' ? -1 : 1));
+    $('#list').innerHTML = ids.map(id => {
+      const g = by[id], worst = g.list.some(r => r.status === 'CHANGE') ? 'CHANGE' : 'OK';
+      return `<div class="card ${worst}"><h3>${esc(g.title)} <small>${esc(g.type)}</small></h3>` +
+        g.list.map(r => `<div class="row"><span class="tag ${esc(r.status)}">${esc(r.status || '—')}</span><b>${esc(r.from)}</b><small>${esc(new Date(r.received).toLocaleString())}</small></div>${r.comment ? `<p>${esc(r.comment)}</p>` : ''}`).join('') + '</div>';
+    }).join('') || '<p>No answers yet.</p>';
+    $('#out').hidden = false; $('#login').hidden = true;
+  }
+  $('#login').addEventListener('submit', e => { e.preventDefault(); key = $('#key').value.trim(); try { sessionStorage.setItem('mp-guests-key', key); } catch (e) {} load(); });
+  $('#refresh').addEventListener('click', load);
+  if (key) load();
+})();
+</script>
+</body>
+</html>

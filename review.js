@@ -21,48 +21,37 @@
   const sunday = click('[data-day="sun"]'), taxi = click('[data-tab="taxi"]'), bus = click('[data-tab="bus"]');
   const backendMissing = !((window.MP_CONFIG || {}).rsvpEndpoint);
 
+  // Only what the couple needs to look at. (Technical checks for the developer live in docs/CHECKLIST.md.)
   const ITEMS = [
     // ---- Orange: design changes ----
-    { t: 'design', sel: '.signature', label: 'Changed · fits one line on phones', title: 'Welcome signature',
+    { id: 'signature', t: 'design', sel: '.signature', label: 'Changed · fits one line on phones', title: 'Welcome signature',
       note: 'In v3 “Michelle & Pa” wrapped onto two lines on phones. It now scales down slightly and stays on one line.' },
-    { t: 'design', sel: '.welcome-photo', label: 'Changed · photo re-cropped', title: 'Couple photo',
+    { id: 'photo', t: 'design', sel: '.welcome-photo', label: 'Changed · photo re-cropped', title: 'Couple photo',
       note: 'The original was a phone screenshot with black bars and the home-bar line. Cropped to the photo only, at full resolution.' },
-    { t: 'design', sel: '[data-ev] .event-btns', label: 'Changed · real calendar files', title: '“Calendar +” buttons',
+    { id: 'calendar', t: 'design', sel: '[data-ev] .event-btns', label: 'Changed · real calendar files', title: '“Calendar +” buttons',
       note: 'Now open a real calendar file, so iPhones show “Add to Calendar” directly.' },
-    { t: 'design', sel: '.rsvp-actions', label: 'Added · checks, sending & error states', title: 'RSVP checks',
-      note: 'Guests can’t continue without a name, a yes/no, or at least one event. Email format is checked. Shows “Sending…”, and an honest error if a reply fails (v3 always said “Gracias”).' },
-    { t: 'design', sel: '#dock', label: 'Changed · fades in (mobile only)', title: 'Mobile quick-links bar',
-      note: 'Fades and slides in instead of popping in. Only on phones, after scrolling past the top.' },
-    { t: 'design', sel: '.split-head', label: 'Fixed · heading no longer slides over the list (phones)', title: 'Local Guide + Q&A headings',
-      note: 'In v3 these headings stayed pinned while scrolling, which on phones slid them over the list. Now pinned on desktop only, where they sit beside the list.' },
-    { t: 'design', sel: '.footer-contact', label: 'Updated · couple’s numbers and email', title: 'Footer contact',
-      note: 'Matt’s details removed from the footer, as requested. Shows Michelle’s and Pa’s numbers (as +353 Irish numbers) and michelleandpa2027@gmail.com, with tap-to-call.' },
-    { t: 'design', sel: '[data-ev="reception"] .venue', prep: sunday, label: 'Updated · address, 2:30am, taxis', title: 'Reception details',
+    { id: 'rsvp-checks', t: 'design', sel: '.rsvp-actions', label: 'Added · checks, sending & error states', title: 'RSVP checks',
+      note: 'Guests can’t continue without a name, a yes/no, or at least one event. Email format is checked. Shows “Sending…”, and an honest error if a reply fails.' },
+    { id: 'reception', t: 'design', sel: '[data-ev="reception"] .venue', prep: sunday, label: 'Updated · address, 2:30am, taxis', title: 'Reception details',
       note: 'Address Vereda de Vélez, SN, 29712, Málaga. Ends 2:30am, buses leave then; taxis can be organised at the hotel (about €50–€60).' },
-    { t: 'design', sel: null, title: 'RSVP: “How many in your party?”',
+    { id: 'party', t: 'design', sel: null, title: 'RSVP: “How many in your party?”',
       note: 'New + / − counter on the attending step. The guest list adds these up into a headcount (total guests, and guests per event).' },
-    { t: 'design', sel: '#rsvpForm', label: 'Changed · stands out more', title: 'RSVP card',
+    { id: 'rsvp-card', t: 'design', sel: '#rsvpForm', label: 'Changed · stands out more', title: 'RSVP card',
       note: 'The reply card now has a light fill and a stronger gold border so it does not disappear into the navy section.' },
-    { t: 'design', sel: '.hero-name', label: 'Changed · Playfair Display', title: 'Headings font',
+    { id: 'font', t: 'design', sel: '.hero-name', label: 'Changed · Playfair Display', title: 'Headings font',
       note: 'Headings and italic text now use Playfair Display instead of Bodoni Moda, across the whole site and the guest list.' },
-    { t: 'design', sel: null, title: 'Fonts load from the site itself',
-      note: 'Fonts were loaded from Google and failed on some phones (default fonts showed instead). They are now part of the site: faster, always load, and no EU privacy issue with Google Fonts.' },
-    { t: 'design', sel: null, href: '/guests', title: 'New: guest list page (/guests)',
+    { id: 'guests-page', t: 'design', sel: null, href: '/guests', title: 'New: guest list page (/guests)',
       note: 'Password-protected page showing every reply, totals per event, dietary notes, and a CSV download.' },
 
-    // ---- Red: missing / needs confirmation ----
-    { t: 'missing', sel: '#rsvpForm, #rsvpSent', skip: !backendMissing, label: 'Demo only · replies are NOT saved yet', title: 'RSVP backend',
-      note: 'In review mode you can try the whole RSVP and see “Gracias”, but nothing is saved until the Google Sheet is connected (apps-script/SETUP.md).' },
-    { t: 'missing', sel: '.hero-art', label: 'Confirm · is this artwork final?', title: 'Hero illustration',
-      note: 'The file is named “ChatGPT Image…”. Final, or a placeholder?' },
-            { t: 'missing', sel: '.driver:not(.driver-solid)', prep: taxi, label: 'Confirm · is Manolo correct?', title: 'Driver: Manolo',
-      note: 'The couple weren’t sure. Paul has a website; Manolo / Nexotransfer has no phone number or link, so guests can’t book. Confirm the details or remove him.' },
-    { t: 'missing', sel: '.note-links', label: 'Confirm · remove Matt’s email here too?', title: 'Stay section still lists Matt',
-      note: 'The couple asked to remove Matt’s details from the footer. His email still appears here (“Need help choosing?”). Remove it too, or replace with the couple’s email?' },
-    { t: 'missing', sel: '.timetable', prep: bus, label: 'Confirm · re-check times nearer the date', title: 'ALSA bus timetable',
-      note: 'Bus times change. Re-check against ALSA a month or two before May 2027.' },
-    { t: 'missing', sel: '.map-arch', pos: 'in', label: 'Check · map loads on a real phone', title: 'Map of Nerja',
-      note: 'The Google Maps embed couldn’t be verified in automated testing. Check it on a phone.' },
+    // ---- Red: needs the couple's answer ----
+    { id: 'hero', t: 'missing', sel: '.hero-art', label: 'Confirm · is this artwork final?', title: 'Hero illustration',
+      note: 'Is this illustration final, or should it be replaced?' },
+    { id: 'phones', t: 'missing', sel: '.footer-contact', label: 'Confirm · Irish numbers (+353)?', title: 'Footer contact',
+      note: 'Matt’s details are removed. The footer shows Michelle’s and Pa’s numbers as +353 (Irish) and michelleandpa2027@gmail.com. Are the numbers Irish?' },
+    { id: 'manolo', t: 'missing', sel: '.driver:not(.driver-solid)', prep: taxi, label: 'Confirm · is Manolo correct?', title: 'Driver: Manolo',
+      note: 'Manolo / Nexotransfer has no phone number or link, so guests can’t book him. Send his details, or remove him?' },
+    { id: 'matt-email', t: 'missing', sel: '.note-links', label: 'Confirm · remove Matt’s email here too?', title: 'Stay section still lists Matt',
+      note: 'His email still appears here (“Need help choosing?”). Remove it, or replace it with the couple’s email?' },
   ].filter(i => !i.skip);
 
   const COLORS = { design: '#EE7D1A', missing: '#E0312B' };
@@ -95,7 +84,7 @@
     .rv-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #FAF6EF; transition: left .2s; }
     .rv-bar [aria-pressed="true"] .rv-switch { background: ${COLORS.design}; }
     .rv-bar [aria-pressed="true"] .rv-switch::after { left: 14px; }
-    .rv-panel { width: min(360px, calc(100vw - 24px)); max-height: min(60vh, 520px); overflow: auto; background: #FAF6EF; color: #1E2A3A; border-radius: 14px; box-shadow: 0 18px 50px rgba(20,32,52,.35); padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+    .rv-panel { width: min(360px, calc(100vw - 24px)); max-height: min(70vh, 640px); overflow: auto; background: #FAF6EF; color: #1E2A3A; border-radius: 14px; box-shadow: 0 18px 50px rgba(20,32,52,.35); padding: 16px; display: flex; flex-direction: column; gap: 14px; }
     .rv-panel h4 { margin: 0; display: flex; align-items: center; gap: 8px; font: 600 10px Jost, system-ui, sans-serif; letter-spacing: .2em; text-transform: uppercase; }
     .rv-panel h4 i { width: 10px; height: 10px; border-radius: 50%; }
     .rv-panel ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
@@ -104,6 +93,21 @@
     .rv-panel li b { font-weight: 600; font-size: 13px; }
     .rv-panel li span { color: #5E5850; font-size: 12.5px; }
     .rv-panel .rv-exit { align-self: flex-start; background: none; border: none; padding: 4px 0; color: #5E5850; font: 500 11px Jost, system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; text-decoration: underline; cursor: pointer; }
+    .rv-panel li { --c: #999; background: #fff; border: 1px solid rgba(29,62,99,.12); border-left: 3px solid var(--c); border-radius: 6px; }
+    .rv-panel li > button, .rv-panel li > a { border: none; border-radius: 6px 6px 0 0; background: transparent; }
+    .rv-ans { display: flex; flex-direction: column; gap: 6px; padding: 0 11px 10px; }
+    .rv-opts { display: flex; gap: 6px; }
+    .rv-opts button { flex: 1; height: 32px; border-radius: 999px; border: 1px solid rgba(29,62,99,.3); background: #fff; color: #1E2A3A; font: 600 11px Jost, system-ui, sans-serif; cursor: pointer; }
+    .rv-opts button[aria-pressed="true"][data-st="ok"] { background: #2E7D4F; border-color: #2E7D4F; color: #fff; }
+    .rv-opts button[aria-pressed="true"][data-st="change"] { background: ${COLORS.design}; border-color: ${COLORS.design}; color: #fff; }
+    .rv-ans textarea { width: 100%; box-sizing: border-box; min-height: 40px; resize: vertical; border: 1px solid rgba(29,62,99,.2); border-radius: 6px; padding: 7px 9px; font: 400 13px/1.4 Jost, system-ui, sans-serif; color: #1E2A3A; background: #FAF6EF; }
+    .rv-send { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid rgba(29,62,99,.15); padding-top: 12px; }
+    .rv-send select, .rv-send button { height: 38px; border-radius: 999px; font: 600 11px Jost, system-ui, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+    .rv-send select { border: 1px solid rgba(29,62,99,.3); padding: 0 12px; background: #fff; color: #1E2A3A; }
+    .rv-send .rv-submit { border: none; background: #1E2A3A; color: #FAF6EF; cursor: pointer; }
+    .rv-send .rv-submit:disabled { opacity: .5; }
+    .rv-send .rv-copy { border: 1px solid rgba(29,62,99,.3); background: transparent; color: #1E2A3A; cursor: pointer; }
+    .rv-msg { margin: 0; font: 400 12.5px/1.4 Jost, system-ui, sans-serif; color: #5E5850; }
   `;
   document.head.appendChild(css);
 
@@ -129,9 +133,23 @@
   root.classList.toggle('rv-on', on);
 
   const group = t => ITEMS.map((i, n) => ({ ...i, n })).filter(i => i.t === t);
+  // Saved answers (this browser): { [id]: { st: 'ok'|'change', c: 'comment' } }
+  const KEY = 'mp-review-answers', WHO = 'mp-review-who';
+  let ans = {}, who = '';
+  try { ans = JSON.parse(localStorage.getItem(KEY) || '{}'); who = localStorage.getItem(WHO) || ''; } catch (e) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(ans)); localStorage.setItem(WHO, who); } catch (e) {} };
+  const esc = v => String(v == null ? '' : v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const itemHTML = i => {
     const inner = `<b>${i.title}</b><span>${i.note}</span>`;
-    return `<li style="--c:${COLORS[i.t]}">${i.href ? `<a href="${i.href}" target="_blank" rel="noopener">${inner}</a>` : `<button type="button" data-rv-go="${i.n}">${inner}</button>`}</li>`;
+    const a = ans[i.id] || {};
+    return `<li style="--c:${COLORS[i.t]}" data-id="${i.id}">${i.href ? `<a href="${i.href}" target="_blank" rel="noopener">${inner}</a>` : `<button type="button" data-rv-go="${i.n}">${inner}</button>`}
+      <div class="rv-ans">
+        <div class="rv-opts">
+          <button type="button" data-st="ok" aria-pressed="${a.st === 'ok'}">${i.t === 'missing' ? 'Yes, fine' : 'Looks good'}</button>
+          <button type="button" data-st="change" aria-pressed="${a.st === 'change'}">${i.t === 'missing' ? 'No / change' : 'Change this'}</button>
+        </div>
+        <textarea data-c placeholder="${i.t === 'missing' ? 'Your answer…' : 'Comment (optional)'}">${esc(a.c)}</textarea>
+      </div></li>`;
   };
   const design = group('design'), missing = group('missing');
 
@@ -143,6 +161,15 @@
       <ul>${design.map(itemHTML).join('')}</ul>
       <h4><i style="background:${COLORS.missing}"></i>Missing / to confirm · ${missing.length}</h4>
       <ul>${missing.map(itemHTML).join('')}</ul>
+      <div class="rv-send">
+        <select class="rv-who" aria-label="Who is answering?">
+          <option value="">Who is answering?</option>
+          <option>Michelle</option><option>Pa</option>
+        </select>
+        <button type="button" class="rv-submit">Send my answers</button>
+        <p class="rv-msg" role="status"></p>
+        <button type="button" class="rv-copy">Copy answers (to paste in a message)</button>
+      </div>
       <button type="button" class="rv-exit">Exit review mode</button>
     </div>
     <div class="rv-bar">
@@ -164,7 +191,48 @@
     panel.hidden = !panel.hidden;
     listBtn.setAttribute('aria-expanded', String(!panel.hidden));
   });
+  const byId = id => ITEMS.find(i => i.id === id);
+  const whoEl = $('.rv-who', ui), msg = $('.rv-msg', ui), submit = $('.rv-submit', ui);
+  whoEl.value = who;
+  whoEl.addEventListener('change', () => { who = whoEl.value; save(); });
+  const count = () => { const n = Object.values(ans).filter(a => a.st).length; msg.textContent = n ? `${n} of ${ITEMS.length} answered on this device.` : ''; };
+  count();
+  panel.addEventListener('input', e => {
+    const li = e.target.closest('li[data-id]'); if (!li || !e.target.matches('[data-c]')) return;
+    (ans[li.dataset.id] = ans[li.dataset.id] || {}).c = e.target.value; save();
+  });
+  const payload = () => ITEMS.filter(i => ans[i.id] && (ans[i.id].st || ans[i.id].c)).map(i => ({ id: i.id, type: i.t, title: i.title, status: ans[i.id].st || '', comment: (ans[i.id].c || '').trim() }));
+  $('.rv-copy', ui).addEventListener('click', async () => {
+    const lines = payload().map(a => `• ${a.title}: ${a.status === 'ok' ? 'OK' : a.status === 'change' ? 'CHANGE' : '—'}${a.comment ? ' — ' + a.comment : ''}`);
+    const text = `Review answers${who ? ' from ' + who : ''}:\n` + lines.join('\n');
+    try { await navigator.clipboard.writeText(text); msg.textContent = 'Copied. Paste it in a message.'; } catch (err) { msg.textContent = 'Could not copy on this browser.'; }
+  });
+  submit.addEventListener('click', async () => {
+    const items = payload();
+    if (!who) { msg.textContent = 'Please choose who is answering first.'; return; }
+    if (!items.length) { msg.textContent = 'Nothing answered yet.'; return; }
+    const endpoint = (window.MP_CONFIG || {}).rsvpEndpoint;
+    submit.disabled = true; msg.textContent = 'Sending…';
+    try {
+      if (!endpoint) throw new Error('no endpoint');
+      const res = await fetch(endpoint, { method: 'POST', body: JSON.stringify({ type: 'review', from: who, answers: items }) });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || !out.ok) throw new Error(out.error || 'HTTP ' + res.status);
+      msg.textContent = 'Sent. Thank you! You can change an answer and send again.';
+    } catch (err) {
+      msg.textContent = 'Could not send. Please use “Copy answers” and paste them in a message instead.';
+    }
+    submit.disabled = false;
+  });
+
   panel.addEventListener('click', e => {
+    const opt = e.target.closest('.rv-opts button');
+    if (opt) {
+      const li = opt.closest('li[data-id]'), a = ans[li.dataset.id] = ans[li.dataset.id] || {};
+      a.st = a.st === opt.dataset.st ? '' : opt.dataset.st; save();
+      li.querySelectorAll('.rv-opts button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.st === a.st)));
+      count(); return;
+    }
     if (e.target.closest('.rv-exit')) {
       try { sessionStorage.removeItem('mp-review'); sessionStorage.removeItem('mp-review-off'); } catch (err) {}
       location.href = location.pathname + location.hash;

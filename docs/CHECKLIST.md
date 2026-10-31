@@ -25,6 +25,9 @@ Work top to bottom. Each phase can wait — nothing below breaks the live site.
   - [ ] Manolo / Nexotransfer: the couple weren't sure. Find a phone/link, or remove him
   - [ ] Matt's email is still in the **Stay** section ("Need help choosing?"). Remove too, or swap for the couple's email?
   - [ ] Confirm the phone numbers are Irish (+353)
+  - (The review panel now only lists items for the couple. Developer-only checks are in Phase 4 and "Later" below.)
+- [ ] Re-deploy the Apps Script once so review answers can be saved: Extensions → Apps Script → paste the new `apps-script/Code.gs` → Deploy → Manage deployments → ✏️ → Version: New version → Deploy (URL stays the same).
+- [ ] Answers appear in the sheet's **Review** tab and on `/review-answers` (same password as `/guests`). If sending fails, the panel has a **Copy answers** button to paste in a message.
 - [ ] Send Claude their answers → Claude updates the site and pushes (Vercel redeploys automatically).
 
 ## Phase 2 — Connect RSVPs (~10 min, in the couple's Google account)

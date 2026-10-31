@@ -60,9 +60,51 @@ function upsert_(sh, row) {
   return false;
 }
 
+// ---- Design-review answers (from the ?review panel) → "Review" tab; latest answer per person+item wins ----
+const REVIEW_SHEET = 'Review';
+const REVIEW_HEADERS = ['Received', 'From', 'Item ID', 'Item', 'Type', 'Status', 'Comment'];
+
+function reviewSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(REVIEW_SHEET);
+  if (!sh) {
+    sh = ss.insertSheet(REVIEW_SHEET);
+    sh.appendRow(REVIEW_HEADERS);
+    sh.setFrozenRows(1);
+    sh.getRange(1, 1, 1, REVIEW_HEADERS.length).setFontWeight('bold');
+  }
+  return sh;
+}
+
+function saveReview_(d) {
+  const from = clean_(d.from, 40);
+  const answers = Array.isArray(d.answers) ? d.answers.slice(0, 60) : [];
+  if (!from || !answers.length) return json_({ ok: false, error: 'missing name or answers' });
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const sh = reviewSheet_();
+    answers.forEach(a => {
+      const id = clean_(a.id, 60);
+      if (!id) return;
+      const st = a.status === 'ok' ? 'OK' : a.status === 'change' ? 'CHANGE' : '';
+      const row = [new Date(), from, id, clean_(a.title, 200), a.type === 'missing' ? 'Question' : 'Design', st, clean_(a.comment, 2000)];
+      const last = sh.getLastRow();
+      let at = 0;
+      if (last > 1) {
+        const keys = sh.getRange(2, 2, last - 1, 2).getValues(); // From, Item ID
+        for (let i = keys.length - 1; i >= 0; i--) if (keys[i][0] === from && keys[i][1] === id) { at = i + 2; break; }
+      }
+      if (at) sh.getRange(at, 1, 1, REVIEW_HEADERS.length).setValues([row]); else sh.appendRow(row);
+    });
+  } finally { lock.releaseLock(); }
+  return json_({ ok: true });
+}
+
 function doPost(e) {
   try {
     const d = JSON.parse((e && e.postData && e.postData.contents) || '{}');
+    if (d.type === 'review') return saveReview_(d);
     if (d.website) return json_({ ok: true }); // honeypot field filled → bot, drop silently
 
     const name = clean_(d.name, 200).replace(/\s+/g, ' ');
@@ -107,6 +149,13 @@ function doGet(e) {
   const given = (e && e.parameter && e.parameter.key) || '';
   if (!key || given !== key) return json_({ ok: false, error: 'unauthorized' });
 
+  if (e.parameter.view === 'review') {
+    const rv = reviewSheet_().getDataRange().getValues().slice(1).map(r => ({
+      received: r[0] instanceof Date ? r[0].toISOString() : String(r[0]),
+      from: String(r[1]), id: String(r[2]), title: String(r[3]), type: String(r[4]), status: String(r[5]), comment: String(r[6]),
+    }));
+    return json_({ ok: true, rows: rv });
+  }
   const values = sheet_().getDataRange().getValues().slice(1);
   const rows = values.map(r => ({
     received: r[0] instanceof Date ? r[0].toISOString() : String(r[0]),
