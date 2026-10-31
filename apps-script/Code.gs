@@ -9,6 +9,7 @@
  * Script properties (Project Settings → Script properties):
  *   ADMIN_KEY     password for the /guests page (required to read replies)
  *   NOTIFY_EMAIL  comma-separated addresses to email on every reply (optional)
+ *   REVIEW_KEY    separate password for /review-answers (optional; falls back to ADMIN_KEY)
  *
  * Setup steps: see apps-script/SETUP.md
  */
@@ -145,8 +146,11 @@ function doPost(e) {
 }
 
 function doGet(e) {
-  const key = PropertiesService.getScriptProperties().getProperty('ADMIN_KEY');
+  const props = PropertiesService.getScriptProperties();
   const given = (e && e.parameter && e.parameter.key) || '';
+  const isReview = e && e.parameter && e.parameter.view === 'review';
+  // Review answers use their own password (REVIEW_KEY); falls back to ADMIN_KEY if REVIEW_KEY isn't set.
+  const key = isReview ? (props.getProperty('REVIEW_KEY') || props.getProperty('ADMIN_KEY')) : props.getProperty('ADMIN_KEY');
   if (!key || given !== key) return json_({ ok: false, error: 'unauthorized' });
 
   if (e.parameter.view === 'review') {

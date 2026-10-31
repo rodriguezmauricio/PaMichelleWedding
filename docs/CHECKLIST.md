@@ -27,7 +27,7 @@ Work top to bottom. Each phase can wait — nothing below breaks the live site.
   - [ ] Confirm the phone numbers are Irish (+353)
   - (The review panel now only lists items for the couple. Developer-only checks are in Phase 4 and "Later" below.)
 - [ ] Re-deploy the Apps Script once so review answers can be saved: Extensions → Apps Script → paste the new `apps-script/Code.gs` → Deploy → Manage deployments → ✏️ → Version: New version → Deploy (URL stays the same).
-- [ ] Answers appear in the sheet's **Review** tab and on `/review-answers` (same password as `/guests`). If sending fails, the panel has a **Copy answers** button to paste in a message.
+- [ ] Answers appear in the sheet's **Review** tab and on `/review-answers` (password = `REVIEW_KEY` script property; add it next to `ADMIN_KEY` — it only unlocks that page, not the guest list). If sending fails, the panel has a **Copy answers** button to paste in a message.
 - [ ] Send Claude their answers → Claude updates the site and pushes (Vercel redeploys automatically).
 
 ## Phase 2 — Connect RSVPs (~10 min, in the couple's Google account)

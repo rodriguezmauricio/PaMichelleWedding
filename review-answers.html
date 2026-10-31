@@ -26,7 +26,7 @@
   <h1>Review answers</h1>
   <small>Private. Answers from the couple's <code>?review</code> panel. Latest answer per person and item.</small>
   <form id="login" style="margin:16px 0;display:flex;gap:8px">
-    <input type="password" id="key" placeholder="Guest-list password" required>
+    <input type="password" id="key" placeholder="Review password" required>
     <button>Open</button>
   </form>
   <p class="err" id="err"></p>
@@ -42,7 +42,7 @@
   const $ = s => document.querySelector(s);
   const esc = v => String(v == null ? '' : v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   let key = '';
-  try { key = sessionStorage.getItem('mp-guests-key') || ''; } catch (e) {}
+  try { key = sessionStorage.getItem('mp-review-key') || ''; } catch (e) {}
   async function load() {
     $('#err').textContent = '';
     try {
@@ -66,7 +66,7 @@
     }).join('') || '<p>No answers yet.</p>';
     $('#out').hidden = false; $('#login').hidden = true;
   }
-  $('#login').addEventListener('submit', e => { e.preventDefault(); key = $('#key').value.trim(); try { sessionStorage.setItem('mp-guests-key', key); } catch (e) {} load(); });
+  $('#login').addEventListener('submit', e => { e.preventDefault(); key = $('#key').value.trim(); try { sessionStorage.setItem('mp-review-key', key); } catch (e) {} load(); });
   $('#refresh').addEventListener('click', load);
   if (key) load();
 })();
