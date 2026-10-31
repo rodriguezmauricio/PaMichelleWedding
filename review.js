@@ -168,7 +168,7 @@
         </select>
         <button type="button" class="rv-submit">Send my answers</button>
         <p class="rv-msg" role="status"></p>
-        <button type="button" class="rv-copy">Copy answers (to paste in a message)</button>
+        <button type="button" class="rv-copy">Send answers as a link (WhatsApp, email…)</button>
       </div>
       <button type="button" class="rv-exit">Exit review mode</button>
     </div>
@@ -202,10 +202,17 @@
     (ans[li.dataset.id] = ans[li.dataset.id] || {}).c = e.target.value; save();
   });
   const payload = () => ITEMS.filter(i => ans[i.id] && (ans[i.id].st || ans[i.id].c)).map(i => ({ id: i.id, type: i.t, title: i.title, status: ans[i.id].st || '', comment: (ans[i.id].c || '').trim() }));
+  // No backend needed: answers travel inside a link that opens /review-answers.
+  const b64 = str => btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   $('.rv-copy', ui).addEventListener('click', async () => {
-    const lines = payload().map(a => `• ${a.title}: ${a.status === 'ok' ? 'OK' : a.status === 'change' ? 'CHANGE' : '—'}${a.comment ? ' — ' + a.comment : ''}`);
-    const text = `Review answers${who ? ' from ' + who : ''}:\n` + lines.join('\n');
-    try { await navigator.clipboard.writeText(text); msg.textContent = 'Copied. Paste it in a message.'; } catch (err) { msg.textContent = 'Could not copy on this browser.'; }
+    const items = payload();
+    if (!who) { msg.textContent = 'Please choose who is answering first.'; return; }
+    if (!items.length) { msg.textContent = 'Nothing answered yet.'; return; }
+    const url = location.origin + '/review-answers#d=' + b64(JSON.stringify({ from: who, at: new Date().toISOString(), answers: items }));
+    try {
+      if (navigator.share) { await navigator.share({ title: 'My review answers', text: 'My answers for the wedding website:', url }); msg.textContent = 'Shared.'; }
+      else { await navigator.clipboard.writeText(url); msg.textContent = 'Link copied. Paste it in a message to Mauricio.'; }
+    } catch (err) { if (err && err.name !== 'AbortError') msg.textContent = 'Could not share on this browser.'; }
   });
   submit.addEventListener('click', async () => {
     const items = payload();
@@ -218,7 +225,7 @@
       if (!res.ok || !out.ok) throw new Error(out.error || 'HTTP ' + res.status);
       msg.textContent = 'Sent. Thank you! You can change an answer and send again.';
     } catch (err) {
-      msg.textContent = 'Could not send. Please use “Copy answers” and paste them in a message instead.';
+      msg.textContent = 'Could not send. Please use “Send answers as a link” below instead.';
     }
     submit.disabled = false;
   });

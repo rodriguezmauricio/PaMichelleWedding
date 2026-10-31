@@ -24,7 +24,7 @@
 <body>
 <main>
   <h1>Review answers</h1>
-  <small>Temporary page (development only). Answers from the couple's <code>?review</code> panel. Latest answer per person and item.</small>
+  <small>Temporary page (development only). Open a link the couple sent, or this page alone for answers saved on the site.</small>
   <p class="err" id="err"></p>
   <div id="out" hidden>
     <div class="sum" id="sum"></div>
@@ -38,6 +38,14 @@
   const esc = v => String(v == null ? '' : v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   async function load() {
     $('#err').textContent = '';
+    const m = location.hash.match(/^#d=(.+)$/);
+    if (m) { // answers sent as a link
+      try {
+        const d = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, '+').replace(/_/g, '/')))));
+        render((d.answers || []).map(a => ({ id: a.id, title: a.title, type: a.type === 'missing' ? 'Question' : 'Design', status: a.status === 'ok' ? 'OK' : a.status === 'change' ? 'CHANGE' : '', comment: a.comment, from: d.from, received: d.at })));
+      } catch (e) { $('#err').textContent = 'That link is not valid.'; }
+      return;
+    }
     try {
       const res = await fetch('/api/review');
       const out = await res.json();
