@@ -32,7 +32,6 @@
     <div id="list"></div>
   </div>
 </main>
-<script src="config.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -40,7 +39,7 @@
   async function load() {
     $('#err').textContent = '';
     try {
-      const res = await fetch(window.MP_CONFIG.rsvpEndpoint + '?view=review');
+      const res = await fetch('/api/review');
       const out = await res.json();
       if (!out.ok) throw new Error(out.error === 'unauthorized' ? 'Wrong password.' : out.error);
       render(out.rows || []);

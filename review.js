@@ -211,11 +211,9 @@
     const items = payload();
     if (!who) { msg.textContent = 'Please choose who is answering first.'; return; }
     if (!items.length) { msg.textContent = 'Nothing answered yet.'; return; }
-    const endpoint = (window.MP_CONFIG || {}).rsvpEndpoint;
     submit.disabled = true; msg.textContent = 'Sending…';
     try {
-      if (!endpoint) throw new Error('no endpoint');
-      const res = await fetch(endpoint, { method: 'POST', body: JSON.stringify({ type: 'review', from: who, answers: items }) });
+      const res = await fetch('/api/review', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from: who, answers: items }) });
       const out = await res.json().catch(() => ({}));
       if (!res.ok || !out.ok) throw new Error(out.error || 'HTTP ' + res.status);
       msg.textContent = 'Sent. Thank you! You can change an answer and send again.';
