@@ -26,8 +26,7 @@ Work top to bottom. Each phase can wait — nothing below breaks the live site.
   - [ ] Matt's email is still in the **Stay** section ("Need help choosing?"). Remove too, or swap for the couple's email?
   - [ ] Confirm the phone numbers are Irish (+353)
   - (The review panel now only lists items for the couple. Developer-only checks are in Phase 4 and "Later" below.)
-- [ ] One-time setup so answers can be saved on the site: Vercel → project **pamichellewedding** → **Storage** → **Create** → **Blob** (choose **Public**) → connect it to the project → redeploy.
-- [ ] Answers arrive as a link the couple shares (opens on `/review-answers`; no setup). The Blob store above is optional (saves on the site). (no password; temporary, delete `review-answers.html`, `api/` and `package.json` when approved). If sending fails, the panel has a **Copy answers** button.
+- [ ] The couple tap **Send answers as a link** in the review panel; you open the link they send (it opens `/review-answers`). Temporary: delete `review-answers.html` when approved.
 - [ ] Send Claude their answers → Claude updates the site and pushes (Vercel redeploys automatically).
 
 ## Phase 2 — Connect RSVPs (~10 min, in the couple's Google account)

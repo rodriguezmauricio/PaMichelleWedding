@@ -104,9 +104,7 @@
     .rv-send { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid rgba(29,62,99,.15); padding-top: 12px; }
     .rv-send select, .rv-send button { height: 38px; border-radius: 999px; font: 600 11px Jost, system-ui, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
     .rv-send select { border: 1px solid rgba(29,62,99,.3); padding: 0 12px; background: #fff; color: #1E2A3A; }
-    .rv-send .rv-submit { border: none; background: #1E2A3A; color: #FAF6EF; cursor: pointer; }
-    .rv-send .rv-submit:disabled { opacity: .5; }
-    .rv-send .rv-copy { border: 1px solid rgba(29,62,99,.3); background: transparent; color: #1E2A3A; cursor: pointer; }
+    .rv-send .rv-copy { border: none; background: #1E2A3A; color: #FAF6EF; cursor: pointer; }
     .rv-msg { margin: 0; font: 400 12.5px/1.4 Jost, system-ui, sans-serif; color: #5E5850; }
   `;
   document.head.appendChild(css);
@@ -166,7 +164,6 @@
           <option value="">Who is answering?</option>
           <option>Michelle</option><option>Pa</option>
         </select>
-        <button type="button" class="rv-submit">Send my answers</button>
         <p class="rv-msg" role="status"></p>
         <button type="button" class="rv-copy">Send answers as a link (WhatsApp, email…)</button>
       </div>
@@ -192,7 +189,7 @@
     listBtn.setAttribute('aria-expanded', String(!panel.hidden));
   });
   const byId = id => ITEMS.find(i => i.id === id);
-  const whoEl = $('.rv-who', ui), msg = $('.rv-msg', ui), submit = $('.rv-submit', ui);
+  const whoEl = $('.rv-who', ui), msg = $('.rv-msg', ui);
   whoEl.value = who;
   whoEl.addEventListener('change', () => { who = whoEl.value; save(); });
   const count = () => { const n = Object.values(ans).filter(a => a.st).length; msg.textContent = n ? `${n} of ${ITEMS.length} answered on this device.` : ''; };
@@ -214,22 +211,6 @@
       else { await navigator.clipboard.writeText(url); msg.textContent = 'Link copied. Paste it in a message to Mauricio.'; }
     } catch (err) { if (err && err.name !== 'AbortError') msg.textContent = 'Could not share on this browser.'; }
   });
-  submit.addEventListener('click', async () => {
-    const items = payload();
-    if (!who) { msg.textContent = 'Please choose who is answering first.'; return; }
-    if (!items.length) { msg.textContent = 'Nothing answered yet.'; return; }
-    submit.disabled = true; msg.textContent = 'Sending…';
-    try {
-      const res = await fetch('/api/review', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from: who, answers: items }) });
-      const out = await res.json().catch(() => ({}));
-      if (!res.ok || !out.ok) throw new Error(out.error || 'HTTP ' + res.status);
-      msg.textContent = 'Sent. Thank you! You can change an answer and send again.';
-    } catch (err) {
-      msg.textContent = 'Could not send. Please use “Send answers as a link” below instead.';
-    }
-    submit.disabled = false;
-  });
-
   panel.addEventListener('click', e => {
     const opt = e.target.closest('.rv-opts button');
     if (opt) {

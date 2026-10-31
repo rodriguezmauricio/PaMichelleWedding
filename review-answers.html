@@ -24,11 +24,10 @@
 <body>
 <main>
   <h1>Review answers</h1>
-  <small>Temporary page (development only). Open a link the couple sent, or this page alone for answers saved on the site.</small>
+  <small>Temporary page (development only). Open the link the couple sent you.</small>
   <p class="err" id="err"></p>
   <div id="out" hidden>
     <div class="sum" id="sum"></div>
-    <button id="refresh" type="button">Refresh</button>
     <div id="list"></div>
   </div>
 </main>
@@ -46,12 +45,7 @@
       } catch (e) { $('#err').textContent = 'That link is not valid.'; }
       return;
     }
-    try {
-      const res = await fetch('/api/review');
-      const out = await res.json();
-      if (!out.ok) throw new Error(out.error === 'unauthorized' ? 'Wrong password.' : out.error);
-      render(out.rows || []);
-    } catch (e) { $('#err').textContent = e.message || 'Could not load.'; $('#out').hidden = true; }
+    $('#err').textContent = 'Open the link the couple sent you.';
   }
   function render(rows) {
     const by = {};
@@ -67,7 +61,6 @@
     }).join('') || '<p>No answers yet.</p>';
     $('#out').hidden = false;
   }
-  $('#refresh').addEventListener('click', load);
   load();
 })();
 </script>
