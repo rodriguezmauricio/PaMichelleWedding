@@ -24,11 +24,7 @@
 <body>
 <main>
   <h1>Review answers</h1>
-  <small>Private. Answers from the couple's <code>?review</code> panel. Latest answer per person and item.</small>
-  <form id="login" style="margin:16px 0;display:flex;gap:8px">
-    <input type="password" id="key" placeholder="Review password" required>
-    <button>Open</button>
-  </form>
+  <small>Temporary page (development only). Answers from the couple's <code>?review</code> panel. Latest answer per person and item.</small>
   <p class="err" id="err"></p>
   <div id="out" hidden>
     <div class="sum" id="sum"></div>
@@ -41,12 +37,10 @@
 (() => {
   const $ = s => document.querySelector(s);
   const esc = v => String(v == null ? '' : v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  let key = '';
-  try { key = sessionStorage.getItem('mp-review-key') || ''; } catch (e) {}
   async function load() {
     $('#err').textContent = '';
     try {
-      const res = await fetch(window.MP_CONFIG.rsvpEndpoint + '?view=review&key=' + encodeURIComponent(key));
+      const res = await fetch(window.MP_CONFIG.rsvpEndpoint + '?view=review');
       const out = await res.json();
       if (!out.ok) throw new Error(out.error === 'unauthorized' ? 'Wrong password.' : out.error);
       render(out.rows || []);
@@ -64,11 +58,10 @@
       return `<div class="card ${worst}"><h3>${esc(g.title)} <small>${esc(g.type)}</small></h3>` +
         g.list.map(r => `<div class="row"><span class="tag ${esc(r.status)}">${esc(r.status || '—')}</span><b>${esc(r.from)}</b><small>${esc(new Date(r.received).toLocaleString())}</small></div>${r.comment ? `<p>${esc(r.comment)}</p>` : ''}`).join('') + '</div>';
     }).join('') || '<p>No answers yet.</p>';
-    $('#out').hidden = false; $('#login').hidden = true;
+    $('#out').hidden = false;
   }
-  $('#login').addEventListener('submit', e => { e.preventDefault(); key = $('#key').value.trim(); try { sessionStorage.setItem('mp-review-key', key); } catch (e) {} load(); });
   $('#refresh').addEventListener('click', load);
-  if (key) load();
+  load();
 })();
 </script>
 </body>
