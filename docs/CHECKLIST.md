@@ -16,15 +16,15 @@ Work top to bottom. Each phase can wait — nothing below breaks the live site.
   - The RSVP can be tried end to end in review mode. **Nothing is saved yet.**
 - [ ] Get their approval on the overall design.
 - [ ] Collect answers to the red items:
-  - [ ] Hero illustration: final, or replace it?
+  - [x] Hero illustration: final (Michelle OK'd, 2 Nov)
   - [x] 2:30 = 2:30am: confirmed. Buses leave the hotel at 2:30am; taxis organised at the hotel (EUR 50-60)
   - [x] Reception address: Vereda de Vélez, SN, 29712, Málaga, Spain
   - [x] Contact details: Michelle 085 736 9303, Pa 085 108 3627 (shown as +353), michelleandpa2027@gmail.com. Matt removed from the footer
   - [x] Headcount field: yes, added ("How many in your party?")
   - [x] RSVP emails go to michelleandpa2027@gmail.com, which also owns the sheet
-  - [ ] Manolo / Nexotransfer: the couple weren't sure. Find a phone/link, or remove him
-  - [ ] Matt's email is still in the **Stay** section ("Need help choosing?"). Remove too, or swap for the couple's email?
-  - [ ] Confirm the phone numbers are Irish (+353)
+  - [x] Manolo / Nexotransfer removed (Michelle, 2 Nov). **Waiting for:** another transfer company's details from the wedding planner, to add under "Recommended drivers" (Transfer or taxi tab)
+  - [x] Matt's email stays in the **Stay** section (Michelle: "his email can stay")
+  - [x] Phone numbers (+353) confirmed by Michelle, 2 Nov
   - (The review panel now only lists items for the couple. Developer-only checks are in Phase 4 and "Later" below.)
 - [ ] The couple tap **Send answers as a link** in the review panel; you open the link they send (it opens `/review-answers`). Temporary: delete `review-answers.html` when approved.
 - [ ] Send Claude their answers → Claude updates the site and pushes (Vercel redeploys automatically).

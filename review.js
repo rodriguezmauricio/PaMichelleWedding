@@ -48,10 +48,6 @@
       note: 'Is this illustration final, or should it be replaced?' },
     { id: 'phones', t: 'missing', sel: '.footer-contact', label: 'Confirm · Irish numbers (+353)?', title: 'Footer contact',
       note: 'Matt’s details are removed. The footer shows Michelle’s and Pa’s numbers as +353 (Irish) and michelleandpa2027@gmail.com. Are the numbers Irish?' },
-    { id: 'manolo', t: 'missing', sel: '.driver:not(.driver-solid)', prep: taxi, label: 'Confirm · is Manolo correct?', title: 'Driver: Manolo',
-      note: 'Manolo / Nexotransfer has no phone number or link, so guests can’t book him. Send his details, or remove him?' },
-    { id: 'matt-email', t: 'missing', sel: '.note-links', label: 'Confirm · remove Matt’s email here too?', title: 'Stay section still lists Matt',
-      note: 'His email still appears here (“Need help choosing?”). Remove it, or replace it with the couple’s email?' },
   ].filter(i => !i.skip);
 
   const COLORS = { design: '#EE7D1A', missing: '#E0312B' };
