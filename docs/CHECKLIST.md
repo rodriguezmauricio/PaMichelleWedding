@@ -66,7 +66,7 @@ Tested end to end on 24 Oct 2026 in Mauricio's own account (sheet "Michelle & Pa
 ## Phase 5 — Launch
 
 - [ ] Share the plain link (no `?review`) with guests.
-- [ ] Optional: remove review mode (delete `review.js` and its `<script>` tag in `index.html`). Guests never see it either way.
+- [ ] Review mode stays for now (decision 3 Nov). Guests never see it without `?review`. Remove later: delete `review.js`, its `<script>` tag and `review-answers.html`. Reusable on other projects: see [REVIEW-KIT.md](REVIEW-KIT.md).
 
 ## Later (closer to May 2027)
 
