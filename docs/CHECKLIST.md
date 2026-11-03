@@ -22,7 +22,7 @@ Work top to bottom. Each phase can wait — nothing below breaks the live site.
   - [x] Contact details: Michelle 085 736 9303, Pa 085 108 3627 (shown as +353), michelleandpa2027@gmail.com. Matt removed from the footer
   - [x] Headcount field: yes, added ("How many in your party?")
   - [x] RSVP emails go to michelleandpa2027@gmail.com, which also owns the sheet
-  - [x] Manolo / Nexotransfer removed (Michelle, 2 Nov). **Waiting for:** another transfer company's details from the wedding planner, to add under "Recommended drivers" (Transfer or taxi tab)
+  - [x] Manolo / Nexotransfer removed (Michelle, 2 Nov). Replaced by two company links the couple sent (3 Nov): NexoTransfer and Nerja Taxis, now under "Recommended drivers"
   - [x] Matt's email stays in the **Stay** section (Michelle: "his email can stay")
   - [x] Phone numbers (+353) confirmed by Michelle, 2 Nov
   - (The review panel now only lists items for the couple. Developer-only checks are in Phase 4 and "Later" below.)
