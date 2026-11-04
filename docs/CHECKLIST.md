@@ -41,6 +41,7 @@ Tested end to end on 24 Oct 2026 in Mauricio's own account (sheet "Michelle & Pa
   - [ ] The notification email arrives
   - [ ] It shows on `/guests` after entering the password
   - [ ] Delete the test row from the sheet
+- [ ] Send the couple the self-guided handover deck: <https://www.michelleandpa.com/docs/handover> (covers the script update below, the guest list, and the two open answers). Regenerate `docs/handover.html` whenever `Code.gs` changes, since the script is embedded in it.
 - [ ] 4 Nov 2026, client asked for names, events and dietary per person: paste the new `Code.gs` into the couple's Apps Script and **Deploy → Manage deployments → pencil → Version: New version → Deploy** (same URL). If the RSVPs tab still has test rows in the old 8-column layout, delete those rows (or rename the tab) first.
 - [ ] Afterwards: delete the test sheet and its Apps Script deployment in Mauricio's account (Deploy → Manage deployments → Archive), so the old URL stops working.
 

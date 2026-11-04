@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Michelle &amp; Pa — website handover</title>
+<style>
+  :root { --navy: #1D3E63; --rose: #A8235F; --blush: #E7B9CC; --gold: #A8894F; --gold-lt: #D9C08E; --cream: #FAF6EF; --sand: #F2E9DA; --ink: #1F1B16; --grey: #5E5850; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--cream); color: var(--ink); font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
+  .deck { height: 100%; display: flex; flex-direction: column; }
+  .stage { flex: 1; position: relative; overflow: hidden; }
+  .slide { position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 28px 20px 40px; display: none; }
+  .slide.on { display: block; }
+  .inner { max-width: 760px; margin: 0 auto; }
+  .kicker { display: block; font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--rose); font-weight: 600; margin-bottom: 14px; }
+  h2 { margin: 0 0 18px; font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: clamp(30px, 6vw, 46px); line-height: 1.05; color: var(--navy); letter-spacing: -.02em; }
+  h3 { margin: 0 0 6px; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  p { margin: 0 0 14px; }
+  .lead { font-size: 19px; line-height: 1.5; }
+  .muted { color: var(--grey); font-size: 15px; }
+  .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px; }
+  .url { font-family: Georgia, serif; font-size: 22px; color: var(--navy); margin: 0 0 8px; overflow-wrap: anywhere; }
+  ul.big { padding-left: 22px; font-size: 18px; } ul.big li { margin: 8px 0; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px; margin-bottom: 14px; }
+  .card { background: #fff; border: 1px solid #e3dccd; border-radius: 8px; padding: 18px 20px; }
+  .card p:last-child { margin: 0; }
+  ol.flow, ol.steps { padding-left: 0; list-style: none; counter-reset: n; margin: 0 0 14px; }
+  ol.flow li, ol.steps li { position: relative; padding: 10px 0 10px 46px; border-bottom: 1px solid #e9e2d4; counter-increment: n; }
+  ol.flow li::before, ol.steps li::before { content: counter(n); position: absolute; left: 0; top: 10px; width: 32px; height: 32px; border-radius: 50%; background: var(--navy); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; }
+  ul.checks { list-style: none; padding: 0; margin: 0 0 14px; }
+  ul.checks li { padding: 10px 0 10px 36px; position: relative; border-bottom: 1px solid #e9e2d4; }
+  ul.checks li::before { content: ""; position: absolute; left: 0; top: 14px; width: 20px; height: 20px; border: 2px solid var(--navy); border-radius: 4px; }
+  .warn { background: var(--sand); border-left: 4px solid var(--rose); padding: 12px 16px; border-radius: 4px; margin: 0 0 14px; }
+  kbd { background: #fff; border: 1px solid #e3dccd; border-bottom-width: 2px; border-radius: 4px; padding: 1px 6px; font-size: 14px; }
+  .btn { background: var(--navy); color: #fff; border: none; border-radius: 999px; padding: 12px 22px; font-weight: 600; cursor: pointer; font-size: 15px; }
+  .btn:hover { background: var(--rose); }
+  .ok { color: #2d6a3e; font-weight: 600; }
+  details summary { cursor: pointer; color: var(--navy); font-weight: 600; }
+  pre { background: #fff; border: 1px solid #e3dccd; border-radius: 6px; padding: 14px; overflow: auto; max-height: 40vh; font-size: 12px; line-height: 1.5; margin: 10px 0 0; }
+  .nav { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); background: var(--navy); color: var(--cream); }
+  .nav button { height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--gold-lt); background: transparent; color: var(--cream); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; font-weight: 600; cursor: pointer; }
+  .nav button[disabled] { opacity: .3; cursor: default; }
+  .nav button.primary { background: var(--cream); color: var(--navy); border-color: var(--cream); }
+  .dots { display: flex; gap: 6px; align-items: center; }
+  .dots i { width: 8px; height: 8px; border-radius: 50%; background: rgba(250,246,239,.35); }
+  .dots i.on { background: var(--blush); }
+  .count { font-size: 12px; letter-spacing: .2em; color: var(--gold-lt); white-space: nowrap; }
+  .cover h2 { font-size: clamp(38px, 8vw, 64px); }
+  @media (max-width: 520px) { .dots { display: none; } }
+</style>
+</head>
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+<section class="slide cover"><div class="inner"><span class="kicker">Michelle &amp; Pa · 8–10 May 2027</span><h2>Your wedding website is ready</h2><p class="lead">This is a short walkthrough you can do yourselves, about 15 minutes, on a laptop. Use the arrows (or swipe) to move through it.</p>
+ <ul class="big">
+  <li>What the site does and where replies go</li>
+  <li>One update you need to apply in your Google account (your two RSVP requests)</li>
+  <li>How to read the guest list</li>
+  <li>Two small answers we still need from you</li>
+ </ul>
+ <p class="muted">Prepared by Mauricio, 4 Nov 2026. If anything does not match what you see, message him with a screenshot.</p></div></section>
+<section class="slide "><div class="inner"><span class="kicker">1 · The site</span><h2>Two links to know</h2><div class="cards">
+  <div class="card"><h3>For guests</h3><p class="url">www.michelleandpa.com</p><p>Share this one. Works on any phone. Calendar buttons, maps, the RSVP form, hotels, travel, Q&amp;A.</p></div>
+  <div class="card"><h3>For you only</h3><p class="url">www.michelleandpa.com/guests</p><p>The guest list. Needs the password Mauricio sent you. Never share this link or the password with guests.</p></div>
+ </div>
+ <p class="muted">The review link (<span class="mono">/?review</span>) you used earlier still works, but guests never see it.</p></div></section>
+<section class="slide "><div class="inner"><span class="kicker">2 · How replies work</span><h2>Where an RSVP goes</h2><ol class="flow">
+  <li><b>Guest replies</b> on the website: name, yes or no, then every person in their party with the events they will join and dietary requirements.</li>
+  <li><b>Google Sheet</b> in <span class="mono">michelleandpa2027@gmail.com</span> gets one row per person. This sheet is the only place the replies are stored. Nothing is kept on the website.</li>
+  <li><b>Email</b> arrives at michelleandpa2027@gmail.com for every reply, listing the party.</li>
+  <li><b>Guest list page</b> reads the same sheet and shows totals per event, dietary notes and a CSV download.</li>
+ </ol>
+ <p class="muted">If a guest replies again with the same name (for example after "Edit reply"), their earlier rows are replaced and the email subject starts with "RSVP updated".</p></div></section>
+<section class="slide "><div class="inner"><span class="kicker">3 · One update to apply</span><h2>Why this step exists</h2><p class="lead">You asked for names, events and dietary requirements <em>per person</em>. The website already does this. The small script inside your Google Sheet must be updated once so the sheet records one row per person.</p>
+ <div class="warn"><strong>Before you start.</strong> Open a private (incognito) window and sign in <strong>only</strong> as michelleandpa2027@gmail.com. If other Google accounts are signed in, Google opens the wrong one.</div>
+ <p>Three short screens follow: copy the script, paste and deploy, then test.</p></div></section>
+<section class="slide "><div class="inner"><span class="kicker">3a · Copy</span><h2>Copy the new script</h2><p>Tap the button. It copies the whole script to your clipboard. You will paste it on the next screen.</p>
+ <p><button class="btn" id="copyBtn" type="button">Copy the script</button> <span id="copyMsg" class="ok" hidden>Copied</span></p>
+ <details><summary>Show the script</summary><pre id="code">/**
+ * Michelle &amp; Pa — RSVP backend (Google Apps Script bound to a Google Sheet).
+ *
+ * doPost: the website sends each reply here. One row per PERSON is written to
+ *         the &quot;RSVPs&quot; tab (name, which events they join, dietary). A repeat reply
+ *         from the same party replaces that party&#x27;s rows. Optionally emails NOTIFY_EMAIL.
+ * doGet:  the /guests page reads all rows, only with the correct ADMIN_KEY.
+ *
+ * Script properties (Project Settings → Script properties):
+ *   ADMIN_KEY     password for the /guests page (required to read replies)
+ *   NOTIFY_EMAIL  comma-separated addresses to email on every reply (optional)
+ *
+ * Setup steps: see apps-script/SETUP.md. After editing this file, deploy a
+ * new version (Deploy → Manage deployments → pencil → New version).
+ */
+
+const SHEET_NAME = &#x27;RSVPs&#x27;;
+const EVENTS = [&#x27;Welcome Drinks&#x27;, &#x27;Ceremony &amp; Reception&#x27;, &#x27;The Cure&#x27;];
+const HEADERS = [&#x27;Received&#x27;, &#x27;Party&#x27;, &#x27;Name&#x27;, &#x27;Attending&#x27;].concat(EVENTS, [&#x27;Dietary&#x27;, &#x27;Email&#x27;, &#x27;Note&#x27;]);
+
+function writeHeader_(sh) {
+  sh.appendRow(HEADERS);
+  sh.setFrozenRows(1);
+  sh.getRange(1, 1, 1, HEADERS.length).setFontWeight(&#x27;bold&#x27;);
+}
+
+function sheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(SHEET_NAME);
+  if (!sh) { sh = ss.insertSheet(SHEET_NAME); writeHeader_(sh); return sh; }
+  const head = sh.getLastRow() ? sh.getRange(1, 1, 1, HEADERS.length).getValues()[0] : [];
+  if (head.join(&#x27;|&#x27;) !== HEADERS.join(&#x27;|&#x27;)) {
+    if (sh.getLastRow() &gt; 1) throw new Error(&#x27;The &quot;&#x27; + SHEET_NAME + &#x27;&quot; tab has old columns. Rename that tab (e.g. &quot;RSVPs old&quot;); a fresh one is created automatically.&#x27;);
+    sh.clear(); writeHeader_(sh);
+  }
+  return sh;
+}
+
+function json_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+// Trim, cap length, and stop guest input being read as a spreadsheet formula.
+function clean_(value, max) {
+  const s = String(value == null ? &#x27;&#x27; : value).trim().slice(0, max);
+  return /^[=+\-@]/.test(s) ? &quot;&#x27;&quot; + s : s;
+}
+function name_(value) { return clean_(value, 200).replace(/\s+/g, &#x27; &#x27;); }
+
+// Key used to recognise the same party replying again (e.g. after &quot;Edit reply&quot;).
+function nameKey_(value) {
+  return String(value == null ? &#x27;&#x27; : value).replace(/^&#x27;/, &#x27;&#x27;).toLowerCase().replace(/\s+/g, &#x27; &#x27;).trim();
+}
+
+// Remove this party&#x27;s earlier rows (if any) and append the new ones. Returns true if rows were replaced.
+function upsert_(sh, partyName, rows) {
+  const key = nameKey_(partyName);
+  const last = sh.getLastRow();
+  let replaced = false;
+  if (last &gt; 1) {
+    const parties = sh.getRange(2, 2, last - 1, 1).getValues();
+    for (let i = parties.length - 1; i &gt;= 0; i--) {
+      if (nameKey_(parties[i][0]) === key) { sh.deleteRow(i + 2); replaced = true; }
+    }
+  }
+  rows.forEach(r =&gt; sh.appendRow(r));
+  return replaced;
+}
+
+function splitList_(value) {
+  return String(value == null ? &#x27;&#x27; : value).split(&#x27;,&#x27;).map(s =&gt; s.trim()).filter(Boolean);
+}
+
+function doPost(e) {
+  try {
+    const d = JSON.parse((e &amp;&amp; e.postData &amp;&amp; e.postData.contents) || &#x27;{}&#x27;);
+    if (d.website) return json_({ ok: true }); // honeypot field filled → bot, drop silently
+
+    const partyName = name_(d.name);
+    const attending = d.attending === &#x27;Yes&#x27; ? &#x27;Yes&#x27; : d.attending === &#x27;No&#x27; ? &#x27;No&#x27; : &#x27;&#x27;;
+    if (!partyName || !attending) return json_({ ok: false, error: &#x27;missing name or attendance&#x27; });
+    const email = clean_(d.email, 200), note = clean_(d.note, 2000);
+
+    let people = [];
+    if (attending === &#x27;Yes&#x27;) {
+      const list = Array.isArray(d.party) ? d.party.slice(0, 12) : [];
+      people = list.map(p =&gt; ({ name: name_(p &amp;&amp; p.name), events: splitList_(p &amp;&amp; p.events), diet: clean_(p &amp;&amp; p.diet, 300) })).filter(p =&gt; p.name);
+      // Older website version: one summary entry.
+      if (!people.length) people = [{ name: partyName, events: splitList_(d.events), diet: clean_(d.diet, 300) }];
+    } else {
+      people = [{ name: partyName, events: [], diet: &#x27;&#x27; }];
+    }
+
+    const now = new Date();
+    const rows = people.map(p =&gt; [now, partyName, p.name, attending]
+      .concat(EVENTS.map(ev =&gt; attending === &#x27;Yes&#x27; &amp;&amp; p.events.indexOf(ev) &gt;= 0 ? &#x27;Yes&#x27; : &#x27;&#x27;))
+      .concat([p.diet, email, note]));
+
+    const lock = LockService.getScriptLock();
+    lock.waitLock(10000);
+    let replaced = false;
+    try { replaced = upsert_(sheet_(), partyName, rows); } finally { lock.releaseLock(); }
+
+    const to = PropertiesService.getScriptProperties().getProperty(&#x27;NOTIFY_EMAIL&#x27;);
+    if (to) {
+      const lines = [&#x27;Reply from: &#x27; + partyName, &#x27;Attending: &#x27; + attending];
+      if (attending === &#x27;Yes&#x27;) {
+        lines.push(&#x27;&#x27;, &#x27;Party (&#x27; + people.length + &#x27;):&#x27;);
+        people.forEach(p =&gt; {
+          const evs = EVENTS.filter(ev =&gt; p.events.indexOf(ev) &gt;= 0);
+          lines.push(&#x27;- &#x27; + p.name + &#x27; — &#x27; + (evs.length ? evs.join(&#x27;, &#x27;) : &#x27;no events&#x27;) + (p.diet ? &#x27; — Dietary: &#x27; + p.diet : &#x27;&#x27;));
+        });
+      }
+      if (email) lines.push(&#x27;&#x27;, &#x27;Email: &#x27; + email);
+      if (note) lines.push(&#x27;Note: &#x27; + note);
+      if (replaced) lines.push(&#x27;&#x27;, &#x27;This replaces an earlier reply from the same name.&#x27;);
+      const mail = {
+        to: to,
+        subject: (replaced ? &#x27;RSVP updated — &#x27; : &#x27;RSVP — &#x27;) + partyName + (attending === &#x27;Yes&#x27; ? &#x27; (&#x27; + people.length + &#x27;) is coming&#x27; : &#x27; can’t make it&#x27;),
+        body: lines.join(&#x27;\n&#x27;) + &#x27;\n\nAll replies: &#x27; + SpreadsheetApp.getActiveSpreadsheet().getUrl(),
+      };
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) mail.replyTo = email;
+      MailApp.sendEmail(mail);
+    }
+    return json_({ ok: true });
+  } catch (err) {
+    return json_({ ok: false, error: String(err) });
+  }
+}
+
+function doGet(e) {
+  const key = PropertiesService.getScriptProperties().getProperty(&#x27;ADMIN_KEY&#x27;);
+  const given = (e &amp;&amp; e.parameter &amp;&amp; e.parameter.key) || &#x27;&#x27;;
+  if (!key || given !== key) return json_({ ok: false, error: &#x27;unauthorized&#x27; });
+
+  const values = sheet_().getDataRange().getValues().slice(1);
+  const rows = values.map(r =&gt; ({
+    received: r[0] instanceof Date ? r[0].toISOString() : String(r[0]),
+    party: String(r[1]), name: String(r[2]), attending: String(r[3]),
+    events: EVENTS.filter((ev, i) =&gt; String(r[4 + i]) === &#x27;Yes&#x27;),
+    diet: String(r[7]), email: String(r[8]), note: String(r[9]),
+  }));
+  return json_({ ok: true, rows: rows });
+}
+</pre></details></div></section>
+<section class="slide "><div class="inner"><span class="kicker">3b · Paste and deploy</span><h2>In your Google Sheet</h2><ol class="steps">
+  <li>Open the sheet <strong>Michelle &amp; Pa — RSVPs</strong> in Google Drive (signed in as michelleandpa2027@gmail.com).</li>
+  <li>Menu <strong>Extensions</strong> → <strong>Apps Script</strong>. A code editor opens in a new tab.</li>
+  <li>Click inside the code, select everything (<kbd>Ctrl</kbd>+<kbd>A</kbd>, or <kbd>Cmd</kbd>+<kbd>A</kbd> on a Mac) and paste (<kbd>Ctrl</kbd>+<kbd>V</kbd>).</li>
+  <li>Save: <kbd>Ctrl</kbd>+<kbd>S</kbd> or the disk icon.</li>
+  <li>Top right: <strong>Deploy</strong> → <strong>Manage deployments</strong>.</li>
+  <li>Click the <strong>pencil icon</strong>. Under <strong>Version</strong> choose <strong>New version</strong>. Click <strong>Deploy</strong>, then <strong>Done</strong>.</li>
+  <li>Back in the sheet: if the <strong>RSVPs</strong> tab contains test rows, delete those rows (keep nothing but the header, or delete the whole tab). The script rebuilds it on the next reply.</li>
+ </ol>
+ <p class="muted">The web address of the script does not change, so the website needs no change. If Google asks you to authorise again, choose michelleandpa2027@gmail.com and allow.</p></div></section>
+<section class="slide "><div class="inner"><span class="kicker">3c · Test</span><h2>Send one test reply</h2><ol class="steps">
+  <li>Open <strong>www.michelleandpa.com</strong>, go to RSVP, reply as "Test Party", <strong>Yes</strong>, add a second guest with a dietary note, send.</li>
+  <li>Check the sheet: the <strong>RSVPs</strong> tab should show <strong>two rows</strong>, one per person, with Yes in the event columns.</li>
+  <li>Check the inbox: an email "RSVP — Test Party (2) is coming" listing both people.</li>
+  <li>Open <strong>www.michelleandpa.com/guests</strong>, enter the password: "Test Party" appears with both names.</li>
+  <li>Delete the two test rows from the sheet.</li>
+ </ol>
+ <div class="warn"><strong>If the website says "your reply didn't send".</strong> The most common cause is that the update was deployed as a different Google account. Repeat 3b in a private window signed in only as michelleandpa2027@gmail.com, then message Mauricio if it still fails.</div></div></section>
+<section class="slide "><div class="inner"><span class="kicker">4 · The guest list</span><h2>Reading www.michelleandpa.com/guests</h2><div class="cards">
+  <div class="card"><h3>Big numbers</h3><p>Guests coming is the headcount (people, not replies). Each event shows how many people chose it. Dietary notes counts people with a requirement.</p></div>
+  <div class="card"><h3>Each reply</h3><p>One block per party: who replied, when, then every person with their event tags and dietary note, plus email and message.</p></div>
+  <div class="card"><h3>Buttons</h3><p><strong>Refresh</strong> reloads from the sheet. <strong>Download CSV</strong> gives one row per person for Excel or Numbers. <strong>Log out</strong> forgets the password on that device.</p></div>
+  <div class="card"><h3>Filters</h3><p>Coming, Not coming, Dietary, and a search box that finds any name in any party.</p></div>
+ </div>
+ <p class="muted">The sheet itself is also fine to use directly: filter the event columns by "Yes" for a per-event list.</p></div></section>
+<section class="slide "><div class="inner"><span class="kicker">5 · Still needed from you</span><h2>Two answers, then we are done</h2><ol class="steps">
+  <li><strong>Hero illustration.</strong> The drawing at the top of the site was generated with AI as a placeholder. Keep it, or send Mauricio a photo or artwork you prefer.</li>
+  <li><strong>Phone numbers.</strong> The site shows Michelle 085 736 9303 and Pa 085 108 3627 as Irish numbers (+353). Confirm both are correct and Irish.</li>
+ </ol>
+ <p>Reply by message, or open <strong>www.michelleandpa.com/?review</strong> and answer the two red items there.</p></div></section>
+<section class="slide last"><div class="inner"><span class="kicker">6 · Going live</span><h2>Checklist before you share the link</h2><ul class="checks">
+  <li>Step 3 done: test reply gave two rows in the sheet.</li>
+  <li>Password for the guest list saved somewhere safe.</li>
+  <li>Both of you tried the site on your own phones once: calendar buttons, map, RSVP.</li>
+  <li>Share <strong>www.michelleandpa.com</strong> with guests (the plain link, no "?review").</li>
+  <li>RSVP deadline on the site is <strong>9 February 2027</strong>. After that, download the CSV for final numbers.</li>
+ </ul>
+ <p class="muted">Replies keep arriving in your sheet and inbox without anyone doing anything. If something looks wrong at any point, send Mauricio a screenshot and the time it happened.</p></div></section>
+  </div>
+  <div class="nav">
+    <button type="button" id="prev">Back</button>
+    <div class="dots" id="dots"></div>
+    <span class="count" id="count"></span>
+    <button type="button" id="next" class="primary">Next</button>
+  </div>
+</div>
+<script>
+(() => {
+  const slides = [...document.querySelectorAll('.slide')], dots = document.getElementById('dots'), count = document.getElementById('count');
+  const prev = document.getElementById('prev'), next = document.getElementById('next');
+  dots.innerHTML = slides.map(() => '<i></i>').join('');
+  let i = Math.min(slides.length - 1, Math.max(0, (parseInt(location.hash.slice(1), 10) || 1) - 1));
+  function show(n) {
+    i = Math.min(slides.length - 1, Math.max(0, n));
+    slides.forEach((s, k) => { s.classList.toggle('on', k === i); if (k === i) s.scrollTop = 0; });
+    [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i));
+    count.textContent = (i + 1) + ' / ' + slides.length;
+    prev.disabled = i === 0; next.disabled = i === slides.length - 1;
+    next.textContent = i === slides.length - 1 ? 'Done' : 'Next';
+    history.replaceState(null, '', '#' + (i + 1));
+  }
+  prev.addEventListener('click', () => show(i - 1));
+  next.addEventListener('click', () => show(i + 1));
+  document.addEventListener('keydown', e => {
+    if (e.target.closest('input, textarea')) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); show(i + 1); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(i - 1); }
+  });
+  let tx = 0, ty = 0;
+  const stage = document.getElementById('stage');
+  stage.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+  stage.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) show(i + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+  const btn = document.getElementById('copyBtn'), msg = document.getElementById('copyMsg');
+  btn.addEventListener('click', async () => {
+    const text = document.getElementById('code').textContent;
+    try { await navigator.clipboard.writeText(text); }
+    catch (e) { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+    msg.hidden = false; setTimeout(() => { msg.hidden = true; }, 2500);
+  });
+  window.addEventListener('hashchange', () => { const n = parseInt(location.hash.slice(1), 10); if (n && n - 1 !== i) show(n - 1); });
+  show(i);
+})();
+</script>
+</body>
+</html>
