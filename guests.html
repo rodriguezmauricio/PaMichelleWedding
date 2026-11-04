@@ -59,6 +59,13 @@
   .g-when { font-size: 12px; color: var(--grey); }
   .g-detail { display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.6; color: var(--text); overflow-wrap: anywhere; }
   .g-detail strong { font-size: 9px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold-dk); font-weight: 600; margin-right: 6px; }
+  .g-people { list-style: none; margin: 0 0 4px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .g-people li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding-bottom: 10px; border-bottom: 1px dashed rgba(29, 62, 99, .18); }
+  .g-person { font-family: var(--serif); font-size: 18px; color: var(--navy); }
+  .g-events { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+  .g-events i { font-style: normal; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600; color: var(--navy); border: 1px solid rgba(29, 62, 99, .35); border-radius: 999px; padding: 3px 8px; }
+  .g-events i.none { color: var(--rose); border-color: rgba(168, 35, 95, .4); }
+  .g-diet { flex-basis: 100%; font-size: 14px; }
   .g-note { font-family: var(--serif); font-style: italic; font-size: 16px; color: var(--navy); }
   .g-empty { padding: 40px 0; text-align: center; font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--grey); }
 </style>
@@ -77,7 +84,7 @@
   <div class="g-head">
     <div class="eyebrow"><span class="no">Private</span><span class="rule"></span><span>Guest list</span></div>
     <h1>Who's<br><em>coming</em></h1>
-    <p id="intro">Replies arrive here as guests RSVP on the website. Each reply says how many people are in the party, so the big number is the headcount.</p>
+    <p id="intro">Replies arrive here as guests RSVP on the website. Every person in a party is listed with the events they will join and any dietary requirements, so the big number is the headcount.</p>
   </div>
 
   <form class="g-login" id="login">
@@ -110,35 +117,38 @@
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const endpoint = (window.MP_CONFIG || {}).rsvpEndpoint;
   const EVENTS = ['Welcome Drinks', 'Ceremony & Reception', 'The Cure'];
-  let replies = [], filter = 'all', query = '';
+  const SHORT = { 'Welcome Drinks': 'Drinks', 'Ceremony & Reception': 'Ceremony', 'The Cure': 'The Cure' };
+  let parties = [], filter = 'all', query = '';
 
   const store = {
     get() { try { return sessionStorage.getItem('mp-guests-key') || ''; } catch (e) { return ''; } },
     set(v) { try { v ? sessionStorage.setItem('mp-guests-key', v) : sessionStorage.removeItem('mp-guests-key'); } catch (e) {} },
   };
   const showMsg = t => { $('#msg').textContent = t; $('#msg').hidden = !t; };
+  const key = s => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
 
-  // Keep only the latest reply per person (edits re-submit), but remember how many times they replied.
-  function latestPerGuest(rows) {
-    const byName = new Map();
+  // The sheet holds one row per person. Group them into parties (one reply each), newest first.
+  function groupParties(rows) {
+    const byParty = new Map();
     rows.forEach(r => {
-      const k = r.name.toLowerCase().replace(/\s+/g, ' ').trim();
-      const prev = byName.get(k);
-      if (!prev) byName.set(k, { ...r, count: 1 });
-      else byName.set(k, { ...(new Date(r.received) >= new Date(prev.received) ? r : prev), count: prev.count + 1 });
+      const k = key(r.party || r.name);
+      if (!byParty.has(k)) byParty.set(k, { party: r.party || r.name, received: r.received, attending: r.attending, email: r.email, note: r.note, people: [] });
+      const p = byParty.get(k);
+      if (new Date(r.received) > new Date(p.received)) Object.assign(p, { received: r.received, attending: r.attending, email: r.email, note: r.note });
+      p.people.push({ name: r.name, events: r.events || [], diet: r.diet || '' });
     });
-    return [...byName.values()].sort((a, b) => new Date(b.received) - new Date(a.received));
+    return [...byParty.values()].sort((a, b) => new Date(b.received) - new Date(a.received));
   }
 
-  async function load(key) {
+  async function load(k) {
     if (!endpoint) { showMsg('The RSVP backend isn’t connected yet — add the Apps Script URL to config.js (see apps-script/SETUP.md).'); return; }
     $('#go').textContent = 'Loading…';
     try {
-      const res = await fetch(endpoint + '?key=' + encodeURIComponent(key));
+      const res = await fetch(endpoint + '?key=' + encodeURIComponent(k));
       const out = await res.json();
       if (!out.ok) { store.set(''); showMsg(out.error === 'unauthorized' ? 'That password isn’t right.' : 'Couldn’t load replies: ' + out.error); return; }
-      store.set(key);
-      replies = latestPerGuest(out.rows);
+      store.set(k);
+      parties = groupParties(out.rows);
       $('#login').hidden = true; $('#board').hidden = false; $('#actions').hidden = false; showMsg('');
       render();
     } catch (e) {
@@ -149,47 +159,46 @@
   }
 
   function render() {
-    const yes = replies.filter(r => r.attending === 'Yes'), no = replies.filter(r => r.attending === 'No');
+    const coming = parties.filter(p => p.attending === 'Yes'), declined = parties.filter(p => p.attending === 'No');
+    const people = coming.flatMap(p => p.people);
     const stats = [
-      [yes.reduce((n, r) => n + (r.guests || 1), 0), 'Guests coming'], [replies.length, 'Replies'], [no.length, 'Declined', 'rose'],
-      ...EVENTS.map(ev => [yes.filter(r => r.events.split(', ').includes(ev)).reduce((n, r) => n + (r.guests || 1), 0), ev + ' (guests)']),
-      [yes.filter(r => r.diet).length, 'Dietary notes'],
+      [people.length, 'Guests coming'], [parties.length, 'Replies'], [declined.length, 'Declined', 'rose'],
+      ...EVENTS.map(ev => [people.filter(g => g.events.includes(ev)).length, ev]),
+      [people.filter(g => g.diet).length, 'Dietary notes'],
     ];
     $('#stats').innerHTML = stats.map(([n, l, c]) => `<div class="g-stat ${c || ''}"><b>${n}</b><span>${esc(l)}</span></div>`).join('');
 
     const q = query.toLowerCase();
-    const shown = replies.filter(r =>
-      (filter === 'all' || (filter === 'yes' && r.attending === 'Yes') || (filter === 'no' && r.attending === 'No') || (filter === 'diet' && r.diet)) &&
-      (!q || [r.name, r.email, r.note, r.diet].join(' ').toLowerCase().includes(q)));
+    const shown = parties.filter(p =>
+      (filter === 'all' || (filter === 'yes' && p.attending === 'Yes') || (filter === 'no' && p.attending === 'No') || (filter === 'diet' && p.people.some(g => g.diet))) &&
+      (!q || [p.party, p.email, p.note, ...p.people.map(g => g.name + ' ' + g.diet)].join(' ').toLowerCase().includes(q)));
 
-    $('#list').innerHTML = shown.length ? shown.map(r => {
-      const when = new Date(r.received);
+    $('#list').innerHTML = shown.length ? shown.map(p => {
+      const when = new Date(p.received);
       const whenTxt = isNaN(when) ? '' : when.toLocaleString('en-IE', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const yes = p.attending === 'Yes';
       return `<article class="g-row">
         <div class="g-name">
-          <h2>${esc(r.name)}</h2>
-          <div class="g-badges">
-            <span class="g-pill ${r.attending === 'Yes' ? 'yes' : 'no'}">${r.attending === 'Yes' ? 'Coming · ' + (r.guests || 1) : 'Not coming'}</span>
-            ${r.count > 1 ? `<span class="g-pill dup" title="Latest reply shown">Replied ${r.count}×</span>` : ''}
-          </div>
+          <h2>${esc(p.party)}</h2>
+          <div class="g-badges"><span class="g-pill ${yes ? 'yes' : 'no'}">${yes ? 'Coming · ' + p.people.length : 'Not coming'}</span></div>
           <span class="g-when">${esc(whenTxt)}</span>
         </div>
         <div class="g-detail">
-          ${r.attending === 'Yes' ? `<span><strong>Events</strong>${esc(r.events || '—')}</span>` : ''}
-          ${r.diet ? `<span><strong>Dietary</strong>${esc(r.diet)}</span>` : ''}
-          ${r.email ? `<span><strong>Email</strong><a href="mailto:${esc(r.email)}">${esc(r.email)}</a></span>` : ''}
-          ${r.note ? `<span class="g-note">“${esc(r.note)}”</span>` : ''}
+          ${yes ? `<ul class="g-people">${p.people.map(g => `<li><span class="g-person">${esc(g.name)}</span><span class="g-events">${g.events.length ? g.events.map(ev => `<i>${esc(SHORT[ev] || ev)}</i>`).join('') : '<i class="none">no events</i>'}</span>${g.diet ? `<span class="g-diet"><strong>Dietary</strong>${esc(g.diet)}</span>` : ''}</li>`).join('')}</ul>` : ''}
+          ${p.email ? `<span><strong>Email</strong><a href="mailto:${esc(p.email)}">${esc(p.email)}</a></span>` : ''}
+          ${p.note ? `<span class="g-note">“${esc(p.note)}”</span>` : ''}
         </div>
       </article>`;
-    }).join('') : `<div class="g-empty">${replies.length ? 'No replies match.' : 'No replies yet.'}</div>`;
+    }).join('') : `<div class="g-empty">${parties.length ? 'No replies match.' : 'No replies yet.'}</div>`;
   }
 
   function downloadCsv() {
-    const cols = ['received', 'name', 'attending', 'guests', 'events', 'diet', 'email', 'note'];
+    const cols = ['received', 'party', 'name', 'attending', ...EVENTS, 'diet', 'email', 'note'];
     const cell = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
-    const csv = [cols.join(','), ...replies.map(r => cols.map(c => cell(r[c])).join(','))].join('\r\n');
+    const lines = [cols.join(',')];
+    parties.forEach(p => p.people.forEach(g => lines.push([p.received, p.party, g.name, p.attending, ...EVENTS.map(ev => g.events.includes(ev) ? 'Yes' : ''), g.diet, p.email, p.note].map(cell).join(','))));
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
+    a.href = URL.createObjectURL(new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' }));
     a.download = 'michelle-pa-rsvps.csv';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
@@ -199,7 +208,7 @@
   $('#refresh').addEventListener('click', () => load(store.get()));
   $('#csv').addEventListener('click', downloadCsv);
   $('#lock').addEventListener('click', () => {
-    store.set(''); replies = [];
+    store.set(''); parties = [];
     $('#board').hidden = true; $('#actions').hidden = true; $('#login').hidden = false; $('#key').value = '';
   });
   $('#filters').addEventListener('click', e => {

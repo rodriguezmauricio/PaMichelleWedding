@@ -150,23 +150,35 @@
 
   /* ---------- RSVP ---------- */
   const EVENT_CHOICES = [['welcome', 'Welcome Drinks', 'Sat 8 May · 18:00'], ['wedding', 'Ceremony & Reception', 'Sun 9 May · 16:00'], ['cure', 'The Cure', 'Mon 10 May · 19:00']];
-  const F = { name: '', attending: null, guests: 1, events: ['welcome', 'wedding', 'cure'], diet: '', email: '', note: '' };
+  const MAX_PARTY = 10;
+  const newGuest = (name = '') => ({ name, events: EVENT_CHOICES.map(([k]) => k), diet: '' });
+  const F = { name: '', attending: null, party: [newGuest()], email: '', note: '' };
   let step = 0, sending = false;
   const form = $('#rsvpForm'), stepEl = $('#rsvpStep'), nextBtn = $('#rsvpNext'), backBtn = $('#rsvpBack'), errEl = $('#rsvpError'), sentEl = $('#rsvpSent');
 
-  const steps = () => ['name', 'attend', ...(F.attending === 'yes' ? ['events'] : []), 'details'];
+  const steps = () => ['name', 'attend', ...(F.attending === 'yes' ? ['party'] : []), 'details'];
   const firstName = () => F.name.trim().split(/\s+/)[0] || '';
   const validEmail = s => !s.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
+  const partyOk = () => F.party.every(g => g.name.trim() && g.events.length > 0);
   const canNext = cur =>
     cur === 'name' ? !!F.name.trim() :
     cur === 'attend' ? !!F.attending :
-    cur === 'events' ? F.events.length > 0 :
+    cur === 'party' ? partyOk() :
     validEmail(F.email);
 
   function syncButton() {
     const list = steps(), cur = list[Math.min(step, list.length - 1)];
     nextBtn.classList.toggle('ready', canNext(cur));
   }
+
+  const guestHTML = (g, i) => `
+      <div class="guest">
+        <div class="guest-head"><span>Guest ${i + 1}</span>${i > 0 ? `<button type="button" class="guest-remove" data-remove="${i}">Remove</button>` : ''}</div>
+        <input class="line-input" data-g="${i}" data-k="name" autocomplete="off" placeholder="Full name" aria-label="Guest ${i + 1} name" value="${esc(g.name)}">
+        <div class="ev-pills" role="group" aria-label="Events guest ${i + 1} will join">${EVENT_CHOICES.map(([k, l]) =>
+          `<button type="button" class="pill-ev" data-g="${i}" data-ev="${k}" aria-pressed="${g.events.includes(k)}">${esc(l)}</button>`).join('')}</div>
+        <input class="line-input" data-g="${i}" data-k="diet" placeholder="Dietary requirements (optional)" aria-label="Guest ${i + 1} dietary requirements" value="${esc(g.diet)}">
+      </div>`;
 
   function renderRsvp() {
     const list = steps(), si = Math.min(step, list.length - 1), cur = list[si], last = si === list.length - 1;
@@ -179,19 +191,18 @@
 
     if (cur === 'name') {
       stepEl.innerHTML = `<label class="step step-name"><span class="q">Who's replying?</span>
-        <input class="line-input big" data-k="name" autocomplete="name" placeholder="Full name(s), as on your invite" value="${esc(F.name)}"></label>`;
+        <input class="line-input big" data-k="name" autocomplete="name" placeholder="Your full name" value="${esc(F.name)}"></label>`;
     } else if (cur === 'attend') {
       const fn = firstName();
       stepEl.innerHTML = `<div class="step" style="text-align:center"><span class="q">${esc(fn ? fn + ', will you attend?' : 'Will you attend?')}</span>
         <div class="attend">${[['yes', 'Yes', 'Joyfully accepts'], ['no', 'No', 'Regretfully declines']].map(([v, s, l]) =>
           `<button type="button" class="opt" data-attend="${v}" aria-pressed="${F.attending === v}"><span>${s}</span><span>${l}</span></button>`).join('')}</div></div>`;
-    } else if (cur === 'events') {
-      stepEl.innerHTML = `<div class="step"><span class="q">Which will you join?</span>
-        <div class="party"><span>How many in your party, including you?</span>
-          <div class="stepper"><button type="button" data-guests="-1" aria-label="One fewer guest"${F.guests <= 1 ? ' disabled' : ''}>−</button><b id="guestCount">${F.guests}</b><button type="button" data-guests="1" aria-label="One more guest"${F.guests >= 12 ? ' disabled' : ''}>+</button></div></div>
-        <div class="chips">${EVENT_CHOICES.map(([k, l, s]) => { const on = F.events.includes(k);
-          return `<button type="button" class="opt" data-event="${k}" aria-pressed="${on}"><span class="chip-text"><span>${esc(l)}</span><span>${s}</span></span><span class="chip-mark">${on ? '✓' : ''}</span></button>`; }).join('')}</div>
-        <label class="field">Dietary requirements<input class="line-input" data-k="diet" placeholder="None" value="${esc(F.diet)}"></label></div>`;
+    } else if (cur === 'party') {
+      if (!F.party[0].name.trim()) F.party[0].name = F.name.trim();
+      stepEl.innerHTML = `<div class="step step-party"><span class="q">Who's in your party?</span>
+        <p class="party-hint">Tap the events each person will join, and add any dietary requirements.</p>
+        <div class="guests">${F.party.map(guestHTML).join('')}</div>
+        ${F.party.length < MAX_PARTY ? `<button type="button" class="guest-add" data-add>+ Add another guest</button>` : ''}</div>`;
     } else {
       stepEl.innerHTML = `<div class="step step-details"><span class="q">Last of all</span>
         <label class="field">Email<input class="line-input" type="email" data-k="email" autocomplete="email" inputmode="email" placeholder="For updates" value="${esc(F.email)}"></label>
@@ -200,18 +211,23 @@
     syncButton();
   }
 
-  stepEl.addEventListener('input', e => { const k = e.target.dataset.k; if (k) { F[k] = e.target.value; syncButton(); } });
+  stepEl.addEventListener('input', e => {
+    const k = e.target.dataset.k; if (!k) return;
+    const g = e.target.dataset.g;
+    if (g !== undefined) F.party[Number(g)][k] = e.target.value; else F[k] = e.target.value;
+    syncButton();
+  });
   stepEl.addEventListener('click', e => {
-    const a = e.target.closest('[data-attend]'), ev = e.target.closest('[data-event]'), g = e.target.closest('[data-guests]');
-    if (g) { F.guests = Math.min(12, Math.max(1, F.guests + Number(g.dataset.guests))); renderRsvp(); $(`[data-guests="${g.dataset.guests}"]`, stepEl)?.focus(); return; }
-    if (a) { F.attending = a.dataset.attend; renderRsvp(); a && $(`[data-attend="${F.attending}"]`, stepEl).focus(); }
+    const a = e.target.closest('[data-attend]'), ev = e.target.closest('[data-ev]'), rm = e.target.closest('[data-remove]'), add = e.target.closest('[data-add]');
+    if (a) { F.attending = a.dataset.attend; renderRsvp(); $(`[data-attend="${F.attending}"]`, stepEl).focus(); return; }
     if (ev) {
-      const k = ev.dataset.event;
-      F.events = F.events.includes(k) ? F.events.filter(x => x !== k) : [...F.events, k];
-      ev.setAttribute('aria-pressed', String(F.events.includes(k)));
-      $('.chip-mark', ev).textContent = F.events.includes(k) ? '✓' : '';
-      syncButton();
+      const g = F.party[Number(ev.dataset.g)], k = ev.dataset.ev;
+      g.events = g.events.includes(k) ? g.events.filter(x => x !== k) : EVENT_CHOICES.map(([x]) => x).filter(x => x === k || g.events.includes(x));
+      ev.setAttribute('aria-pressed', String(g.events.includes(k)));
+      syncButton(); return;
     }
+    if (rm) { F.party.splice(Number(rm.dataset.remove), 1); renderRsvp(); $('[data-add]', stepEl)?.focus(); return; }
+    if (add) { F.party.push(newGuest()); renderRsvp(); $(`[data-g="${F.party.length - 1}"][data-k="name"]`, stepEl)?.focus(); }
   });
   backBtn.addEventListener('click', () => { step = Math.max(0, step - 1); renderRsvp(); });
 
@@ -223,12 +239,16 @@
       if (window.MP_REVIEW) { await new Promise(r => setTimeout(r, 700)); return; }
       throw new Error('RSVP endpoint not configured (config.js)');
     }
+    const labels = ks => EVENT_CHOICES.filter(([k]) => ks.includes(k)).map(([, l]) => l).join(', ');
+    const party = yes ? F.party.map(g => ({ name: g.name.trim(), events: labels(g.events), diet: g.diet.trim() })) : [];
     const payload = {
       name: F.name.trim(),
       attending: yes ? 'Yes' : 'No',
-      guests: yes ? F.guests : 0,
-      events: yes ? EVENT_CHOICES.filter(([k]) => F.events.includes(k)).map(([, l]) => l).join(', ') : '',
-      diet: yes ? F.diet.trim() : '',
+      party,
+      // Summary fields, kept so an older backend version still records something sensible.
+      guests: party.length,
+      events: yes ? labels(EVENT_CHOICES.map(([k]) => k).filter(k => F.party.some(g => g.events.includes(k)))) : '',
+      diet: party.filter(g => g.diet).map(g => `${g.name}: ${g.diet}`).join('; '),
       email: F.email.trim(),
       note: F.note.trim(),
       website: '', // honeypot, must stay empty
@@ -245,6 +265,7 @@
     const list = steps(), cur = list[step];
     if (!canNext(cur)) {
       if (cur === 'details') { errEl.textContent = 'That email address doesn’t look right.'; errEl.hidden = false; }
+      if (cur === 'party') { errEl.textContent = 'Each guest needs a name and at least one event.'; errEl.hidden = false; }
       return;
     }
     if (step < list.length - 1) { step++; renderRsvp(); return; }
@@ -252,9 +273,9 @@
     sending = true; nextBtn.disabled = true; nextBtn.textContent = 'Sending…';
     try {
       await sendReply();
-      const fn = firstName(), yes = F.attending === 'yes';
+      const fn = firstName(), yes = F.attending === 'yes', n = F.party.length;
       $('#sentLine').textContent = yes ? `We're looking forward to seeing you${fn ? ', ' + fn : ''}.` : `We'll miss you${fn ? ', ' + fn : ''}.`;
-      $('#sentSub').textContent = yes ? `Your reply for ${F.guests} ${F.guests === 1 ? 'guest' : 'guests'} at ${F.events.length} of 3 events has been received.` : 'Thank you for letting us know — your reply has been received.';
+      $('#sentSub').textContent = yes ? `Your reply for ${n} ${n === 1 ? 'guest' : 'guests'} has been received.` : 'Thank you for letting us know — your reply has been received.';
       form.hidden = true; sentEl.hidden = false;
     } catch (err) {
       errEl.textContent = 'Sorry — your reply didn’t send. Please try again, or message Michelle or Pa directly.';
