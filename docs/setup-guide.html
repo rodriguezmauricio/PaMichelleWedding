@@ -57,32 +57,40 @@
     <div class="check"><input type="checkbox" id="c2c"><label for="c2c">Save: <kbd>Ctrl</kbd>+<kbd>S</kbd> (or the disk icon).</label></div>
     <div class="check"><input type="checkbox" id="c2d"><label for="c2d">Click <strong>Untitled project</strong> (top left) and rename it <code>RSVP backend</code>. The permission screen shows this name later.</label></div>
     <p style="margin:14px 0 0"><button class="copy" id="copyBtn">Copy the script</button> <span id="copyMsg" class="ok" hidden>Copied</span></p>
-    <details><summary>Show the script (apps-script/Code.gs, copied 2026-10-24)</summary><pre id="code">/**
+    <details><summary>Show the script (apps-script/Code.gs, copied 2026-11-04)</summary><pre id="code">/**
  * Michelle &amp; Pa — RSVP backend (Google Apps Script bound to a Google Sheet).
  *
- * doPost: the website sends each RSVP here; it is written to the &quot;RSVPs&quot; tab
- *         (a repeat reply from the same name replaces that person&#x27;s row) and
- *         (optionally) emailed to NOTIFY_EMAIL.
- * doGet:  the /guests page reads all replies, only with the correct ADMIN_KEY.
+ * doPost: the website sends each reply here. One row per PERSON is written to
+ *         the &quot;RSVPs&quot; tab (name, which events they join, dietary). A repeat reply
+ *         from the same party replaces that party&#x27;s rows. Optionally emails NOTIFY_EMAIL.
+ * doGet:  the /guests page reads all rows, only with the correct ADMIN_KEY.
  *
  * Script properties (Project Settings → Script properties):
  *   ADMIN_KEY     password for the /guests page (required to read replies)
  *   NOTIFY_EMAIL  comma-separated addresses to email on every reply (optional)
  *
- * Setup steps: see apps-script/SETUP.md
+ * Setup steps: see apps-script/SETUP.md. After editing this file, deploy a
+ * new version (Deploy → Manage deployments → pencil → New version).
  */
 
 const SHEET_NAME = &#x27;RSVPs&#x27;;
-const HEADERS = [&#x27;Received&#x27;, &#x27;Name&#x27;, &#x27;Attending&#x27;, &#x27;Guests&#x27;, &#x27;Events&#x27;, &#x27;Dietary&#x27;, &#x27;Email&#x27;, &#x27;Note&#x27;];
+const EVENTS = [&#x27;Welcome Drinks&#x27;, &#x27;Ceremony &amp; Reception&#x27;, &#x27;The Cure&#x27;];
+const HEADERS = [&#x27;Received&#x27;, &#x27;Party&#x27;, &#x27;Name&#x27;, &#x27;Attending&#x27;].concat(EVENTS, [&#x27;Dietary&#x27;, &#x27;Email&#x27;, &#x27;Note&#x27;]);
+
+function writeHeader_(sh) {
+  sh.appendRow(HEADERS);
+  sh.setFrozenRows(1);
+  sh.getRange(1, 1, 1, HEADERS.length).setFontWeight(&#x27;bold&#x27;);
+}
 
 function sheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sh = ss.getSheetByName(SHEET_NAME);
-  if (!sh) {
-    sh = ss.insertSheet(SHEET_NAME);
-    sh.appendRow(HEADERS);
-    sh.setFrozenRows(1);
-    sh.getRange(1, 1, 1, HEADERS.length).setFontWeight(&#x27;bold&#x27;);
+  if (!sh) { sh = ss.insertSheet(SHEET_NAME); writeHeader_(sh); return sh; }
+  const head = sh.getLastRow() ? sh.getRange(1, 1, 1, HEADERS.length).getValues()[0] : [];
+  if (head.join(&#x27;|&#x27;) !== HEADERS.join(&#x27;|&#x27;)) {
+    if (sh.getLastRow() &gt; 1) throw new Error(&#x27;The &quot;&#x27; + SHEET_NAME + &#x27;&quot; tab has old columns. Rename that tab (e.g. &quot;RSVPs old&quot;); a fresh one is created automatically.&#x27;);
+    sh.clear(); writeHeader_(sh);
   }
   return sh;
 }
@@ -96,27 +104,30 @@ function clean_(value, max) {
   const s = String(value == null ? &#x27;&#x27; : value).trim().slice(0, max);
   return /^[=+\-@]/.test(s) ? &quot;&#x27;&quot; + s : s;
 }
+function name_(value) { return clean_(value, 200).replace(/\s+/g, &#x27; &#x27;); }
 
-// Key used to recognise the same guest replying again (e.g. after &quot;Edit reply&quot;).
+// Key used to recognise the same party replying again (e.g. after &quot;Edit reply&quot;).
 function nameKey_(value) {
   return String(value == null ? &#x27;&#x27; : value).replace(/^&#x27;/, &#x27;&#x27;).toLowerCase().replace(/\s+/g, &#x27; &#x27;).trim();
 }
 
-// Write the row: replace this guest&#x27;s earlier row if the name matches, else append. Returns true if replaced.
-function upsert_(sh, row) {
-  const key = nameKey_(row[1]);
+// Remove this party&#x27;s earlier rows (if any) and append the new ones. Returns true if rows were replaced.
+function upsert_(sh, partyName, rows) {
+  const key = nameKey_(partyName);
   const last = sh.getLastRow();
+  let replaced = false;
   if (last &gt; 1) {
-    const names = sh.getRange(2, 2, last - 1, 1).getValues();
-    for (let i = names.length - 1; i &gt;= 0; i--) {
-      if (nameKey_(names[i][0]) === key) {
-        sh.getRange(i + 2, 1, 1, HEADERS.length).setValues([row]);
-        return true;
-      }
+    const parties = sh.getRange(2, 2, last - 1, 1).getValues();
+    for (let i = parties.length - 1; i &gt;= 0; i--) {
+      if (nameKey_(parties[i][0]) === key) { sh.deleteRow(i + 2); replaced = true; }
     }
   }
-  sh.appendRow(row);
-  return false;
+  rows.forEach(r =&gt; sh.appendRow(r));
+  return replaced;
+}
+
+function splitList_(value) {
+  return String(value == null ? &#x27;&#x27; : value).split(&#x27;,&#x27;).map(s =&gt; s.trim()).filter(Boolean);
 }
 
 function doPost(e) {
@@ -124,35 +135,50 @@ function doPost(e) {
     const d = JSON.parse((e &amp;&amp; e.postData &amp;&amp; e.postData.contents) || &#x27;{}&#x27;);
     if (d.website) return json_({ ok: true }); // honeypot field filled → bot, drop silently
 
-    const name = clean_(d.name, 200).replace(/\s+/g, &#x27; &#x27;);
+    const partyName = name_(d.name);
     const attending = d.attending === &#x27;Yes&#x27; ? &#x27;Yes&#x27; : d.attending === &#x27;No&#x27; ? &#x27;No&#x27; : &#x27;&#x27;;
-    if (!name || !attending) return json_({ ok: false, error: &#x27;missing name or attendance&#x27; });
+    if (!partyName || !attending) return json_({ ok: false, error: &#x27;missing name or attendance&#x27; });
+    const email = clean_(d.email, 200), note = clean_(d.note, 2000);
 
-    const guests = attending === &#x27;Yes&#x27; ? Math.min(12, Math.max(1, parseInt(d.guests, 10) || 1)) : 0;
-    const row = [new Date(), name, attending, guests, clean_(d.events, 200), clean_(d.diet, 300), clean_(d.email, 200), clean_(d.note, 2000)];
+    let people = [];
+    if (attending === &#x27;Yes&#x27;) {
+      const list = Array.isArray(d.party) ? d.party.slice(0, 12) : [];
+      people = list.map(p =&gt; ({ name: name_(p &amp;&amp; p.name), events: splitList_(p &amp;&amp; p.events), diet: clean_(p &amp;&amp; p.diet, 300) })).filter(p =&gt; p.name);
+      // Older website version: one summary entry.
+      if (!people.length) people = [{ name: partyName, events: splitList_(d.events), diet: clean_(d.diet, 300) }];
+    } else {
+      people = [{ name: partyName, events: [], diet: &#x27;&#x27; }];
+    }
+
+    const now = new Date();
+    const rows = people.map(p =&gt; [now, partyName, p.name, attending]
+      .concat(EVENTS.map(ev =&gt; attending === &#x27;Yes&#x27; &amp;&amp; p.events.indexOf(ev) &gt;= 0 ? &#x27;Yes&#x27; : &#x27;&#x27;))
+      .concat([p.diet, email, note]));
+
     const lock = LockService.getScriptLock();
     lock.waitLock(10000);
     let replaced = false;
-    try { replaced = upsert_(sheet_(), row); } finally { lock.releaseLock(); }
+    try { replaced = upsert_(sheet_(), partyName, rows); } finally { lock.releaseLock(); }
 
     const to = PropertiesService.getScriptProperties().getProperty(&#x27;NOTIFY_EMAIL&#x27;);
     if (to) {
-      const lines = [
-        &#x27;Name: &#x27; + row[1],
-        &#x27;Attending: &#x27; + row[2],
-        attending === &#x27;Yes&#x27; ? &#x27;Guests: &#x27; + row[3] : &#x27;&#x27;,
-        attending === &#x27;Yes&#x27; ? &#x27;Events: &#x27; + row[4] : &#x27;&#x27;,
-        row[5] ? &#x27;Dietary: &#x27; + row[5] : &#x27;&#x27;,
-        row[6] ? &#x27;Email: &#x27; + row[6] : &#x27;&#x27;,
-        row[7] ? &#x27;Note: &#x27; + row[7] : &#x27;&#x27;,
-      ].filter(Boolean);
+      const lines = [&#x27;Reply from: &#x27; + partyName, &#x27;Attending: &#x27; + attending];
+      if (attending === &#x27;Yes&#x27;) {
+        lines.push(&#x27;&#x27;, &#x27;Party (&#x27; + people.length + &#x27;):&#x27;);
+        people.forEach(p =&gt; {
+          const evs = EVENTS.filter(ev =&gt; p.events.indexOf(ev) &gt;= 0);
+          lines.push(&#x27;- &#x27; + p.name + &#x27; — &#x27; + (evs.length ? evs.join(&#x27;, &#x27;) : &#x27;no events&#x27;) + (p.diet ? &#x27; — Dietary: &#x27; + p.diet : &#x27;&#x27;));
+        });
+      }
+      if (email) lines.push(&#x27;&#x27;, &#x27;Email: &#x27; + email);
+      if (note) lines.push(&#x27;Note: &#x27; + note);
       if (replaced) lines.push(&#x27;&#x27;, &#x27;This replaces an earlier reply from the same name.&#x27;);
       const mail = {
         to: to,
-        subject: (replaced ? &#x27;RSVP updated — &#x27; : &#x27;RSVP — &#x27;) + row[1] + (attending === &#x27;Yes&#x27; ? &#x27; (&#x27; + row[3] + &#x27;) is coming&#x27; : &#x27; can’t make it&#x27;),
+        subject: (replaced ? &#x27;RSVP updated — &#x27; : &#x27;RSVP — &#x27;) + partyName + (attending === &#x27;Yes&#x27; ? &#x27; (&#x27; + people.length + &#x27;) is coming&#x27; : &#x27; can’t make it&#x27;),
         body: lines.join(&#x27;\n&#x27;) + &#x27;\n\nAll replies: &#x27; + SpreadsheetApp.getActiveSpreadsheet().getUrl(),
       };
-      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row[6])) mail.replyTo = row[6];
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) mail.replyTo = email;
       MailApp.sendEmail(mail);
     }
     return json_({ ok: true });
@@ -169,8 +195,9 @@ function doGet(e) {
   const values = sheet_().getDataRange().getValues().slice(1);
   const rows = values.map(r =&gt; ({
     received: r[0] instanceof Date ? r[0].toISOString() : String(r[0]),
-    name: String(r[1]), attending: String(r[2]), guests: Number(r[3]) || 0, events: String(r[4]),
-    diet: String(r[5]), email: String(r[6]), note: String(r[7]),
+    party: String(r[1]), name: String(r[2]), attending: String(r[3]),
+    events: EVENTS.filter((ev, i) =&gt; String(r[4 + i]) === &#x27;Yes&#x27;),
+    diet: String(r[7]), email: String(r[8]), note: String(r[9]),
   }));
   return json_({ ok: true, rows: rows });
 }
@@ -209,7 +236,7 @@ function doGet(e) {
   <section>
     <h2><span class="n">6</span>Test</h2>
     <div class="check"><input type="checkbox" id="c6a"><label for="c6a">Open <a href="https://www.michelleandpa.com" target="_blank" rel="noopener">www.michelleandpa.com</a> (plain link, no <code>?review</code>) and send one test RSVP.</label></div>
-    <div class="check"><input type="checkbox" id="c6b"><label for="c6b">A row appears in the <strong>RSVPs</strong> tab of the sheet (the tab is created on the first reply).</label></div>
+    <div class="check"><input type="checkbox" id="c6b"><label for="c6b">One row <strong>per person</strong> appears in the <strong>RSVPs</strong> tab of the sheet (the tab is created on the first reply).</label></div>
     <div class="check"><input type="checkbox" id="c6c"><label for="c6c">A notification email arrives at michelleandpa2027@gmail.com (subject starts with "RSVP —").</label></div>
     <div class="check"><input type="checkbox" id="c6d"><label for="c6d">Open <a href="https://www.michelleandpa.com/guests" target="_blank" rel="noopener">www.michelleandpa.com/guests</a>, enter the password, and see the reply.</label></div>
     <div class="check"><input type="checkbox" id="c6e"><label for="c6e">Delete the test row from the sheet.</label></div>
@@ -218,6 +245,7 @@ function doGet(e) {
   <section>
     <h2><span class="n">7</span>Afterwards</h2>
     <div class="check"><input type="checkbox" id="c7a"><label for="c7a">In Mauricio's own account, retire the test backend: open its Apps Script → <strong>Deploy</strong> → <strong>Manage deployments</strong> → pencil → <strong>Archive</strong>. Then trash the test sheet.</label></div>
+    <div class="box"><strong>Already set up and updating the script?</strong> Open the sheet → Extensions → Apps Script, replace everything with the script above (Copy the script), save, then <strong>Deploy → Manage deployments → pencil icon → Version: New version → Deploy</strong>. The URL does not change. If the RSVPs tab still holds test rows in the old 8-column layout, delete those rows or rename the tab first.</div>
     <div class="box"><strong>Changing the script later.</strong> Editing <code>Code.gs</code> does not change the live version. After editing: <strong>Deploy → Manage deployments → pencil icon → Version: New version → Deploy</strong>. The URL stays the same, so the website needs no change.</div>
   </section>
 

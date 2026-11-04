@@ -56,11 +56,13 @@ Commit and push. Vercel redeploys automatically.
 ## 6. Test
 
 1. Open the site, send a test RSVP.
-2. A row should appear in the **RSVPs** tab of the sheet (columns: Received, Name, Attending, Guests, Events, Dietary, Email, Note), and an email should arrive.
+2. One row **per person** should appear in the **RSVPs** tab of the sheet (columns: Received, Party, Name, Attending, Welcome Drinks, Ceremony & Reception, The Cure, Dietary, Email, Note), and an email should arrive.
 3. Open `https://www.michelleandpa.com/guests`, enter the `ADMIN_KEY` password, and check that the reply shows.
 4. Delete the test row from the sheet.
 
-A guest who replies again with the same name (for example after "Edit reply") replaces their earlier row; the email subject then starts with "RSVP updated".
+A party that replies again with the same name (for example after "Edit reply") replaces its earlier rows; the email subject then starts with "RSVP updated".
+
+If the tab still has the older 8-column layout from a previous version of the script and contains rows, rename that tab (for example "RSVPs old"); the script creates a fresh one on the next reply. An empty old tab is converted automatically.
 
 ## Changing the script later
 
