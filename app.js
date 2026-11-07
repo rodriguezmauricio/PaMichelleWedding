@@ -180,6 +180,12 @@
         <input class="line-input" data-g="${i}" data-k="diet" placeholder="Dietary requirements (optional)" aria-label="Guest ${i + 1} dietary requirements" value="${esc(g.diet)}">
       </div>`;
 
+  // After a step change, keep the top of the card on screen (just below the fixed bar) instead of letting the page jump.
+  function keepCardInView() {
+    const top = form.getBoundingClientRect().top;
+    if (top < 72 || top > window.innerHeight - 160) form.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+  }
+
   function renderRsvp() {
     const list = steps(), si = Math.min(step, list.length - 1), cur = list[si], last = si === list.length - 1;
     step = si;
@@ -219,17 +225,17 @@
   });
   stepEl.addEventListener('click', e => {
     const a = e.target.closest('[data-attend]'), ev = e.target.closest('[data-ev]'), rm = e.target.closest('[data-remove]'), add = e.target.closest('[data-add]');
-    if (a) { F.attending = a.dataset.attend; renderRsvp(); $(`[data-attend="${F.attending}"]`, stepEl).focus(); return; }
+    if (a) { F.attending = a.dataset.attend; renderRsvp(); $(`[data-attend="${F.attending}"]`, stepEl).focus({ preventScroll: true }); return; }
     if (ev) {
       const g = F.party[Number(ev.dataset.g)], k = ev.dataset.ev;
       g.events = g.events.includes(k) ? g.events.filter(x => x !== k) : EVENT_CHOICES.map(([x]) => x).filter(x => x === k || g.events.includes(x));
       ev.setAttribute('aria-pressed', String(g.events.includes(k)));
       syncButton(); return;
     }
-    if (rm) { F.party.splice(Number(rm.dataset.remove), 1); renderRsvp(); $('[data-add]', stepEl)?.focus(); return; }
+    if (rm) { F.party.splice(Number(rm.dataset.remove), 1); renderRsvp(); return; }
     if (add) { F.party.push(newGuest()); renderRsvp(); $(`[data-g="${F.party.length - 1}"][data-k="name"]`, stepEl)?.focus(); }
   });
-  backBtn.addEventListener('click', () => { step = Math.max(0, step - 1); renderRsvp(); });
+  backBtn.addEventListener('click', () => { step = Math.max(0, step - 1); renderRsvp(); keepCardInView(); });
 
   async function sendReply() {
     const yes = F.attending === 'yes';
@@ -268,7 +274,7 @@
       if (cur === 'party') { errEl.textContent = 'Each guest needs a name and at least one event.'; errEl.hidden = false; }
       return;
     }
-    if (step < list.length - 1) { step++; renderRsvp(); return; }
+    if (step < list.length - 1) { step++; renderRsvp(); keepCardInView(); return; }
 
     sending = true; nextBtn.disabled = true; nextBtn.textContent = 'Sending…';
     try {
@@ -285,7 +291,7 @@
       if (!form.hidden) nextBtn.textContent = 'Send reply';
     }
   });
-  $('#rsvpEdit').addEventListener('click', () => { sentEl.hidden = true; form.hidden = false; step = 0; renderRsvp(); });
+  $('#rsvpEdit').addEventListener('click', () => { sentEl.hidden = true; form.hidden = false; step = 0; renderRsvp(); keepCardInView(); });
   renderRsvp();
 
   /* ---------- Travel ---------- */

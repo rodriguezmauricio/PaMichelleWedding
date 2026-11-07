@@ -241,7 +241,9 @@ input::placeholder, textarea::placeholder { color: rgba(250, 246, 239, .45); }
 .reply-by { display: flex; align-items: baseline; gap: 16px; padding-top: 22px; border-top: 1px solid rgba(217, 192, 142, .35); max-width: 400px; }
 .reply-by span:first-child { font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold-lt); font-weight: 600; }
 .reply-by span:last-child { font-family: var(--serif); font-size: 34px; letter-spacing: -.02em; }
+.rsvp-grid { overflow-anchor: none; } /* a step changing height must not shift the page (browser scroll anchoring) */
 .rsvp-card {
+  scroll-margin-top: 76px;
   display: flex; flex-direction: column; gap: 28px; padding: clamp(64px, 12vw, 96px) clamp(24px, 5vw, 40px) clamp(24px, 5vw, 40px);
   border: 1px solid rgba(217, 192, 142, .85); border-radius: 220px 220px 4px 4px;
   background: rgba(255, 255, 255, .07); box-shadow: 0 40px 80px -40px rgba(0, 0, 0, .6);
